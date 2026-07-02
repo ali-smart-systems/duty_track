@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../personnel/presentation/screens/personnel_screen.dart';
 import '../widgets/app_drawer.dart';
 import 'dashboard_home_screen.dart';
 
@@ -15,7 +16,7 @@ class _DashboardShellState extends State<DashboardShell> {
 
   final List<Widget> pages = const [
     DashboardHomeScreen(),
-    Center(child: Text('القوة البشرية')),
+    PersonnelScreen(),
     Center(child: Text('المهام')),
     Center(child: Text('التقارير')),
   ];
