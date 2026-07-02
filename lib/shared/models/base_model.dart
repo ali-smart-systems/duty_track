@@ -2,13 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class BaseModel {
   final String id;
-
   final DateTime createdAt;
-
   final DateTime updatedAt;
-
   final bool isActive;
-
   final bool isDeleted;
 
   const BaseModel({
@@ -21,9 +17,7 @@ abstract class BaseModel {
 
   Map<String, dynamic> toMap();
 
-  static DateTime? dateTimeFromTimestamp(dynamic value) {
-    if (value == null) return null;
-
+  static DateTime fromTimestamp(dynamic value) {
     if (value is Timestamp) {
       return value.toDate();
     }
@@ -32,6 +26,10 @@ abstract class BaseModel {
       return value;
     }
 
-    return null;
+    return DateTime.now();
+  }
+
+  static Timestamp toTimestamp(DateTime value) {
+    return Timestamp.fromDate(value);
   }
 }
