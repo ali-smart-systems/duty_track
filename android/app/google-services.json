@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "413822446456",
+    "project_id": "duty-track-4fba8",
+    "storage_bucket": "duty-track-4fba8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:413822446456:android:1e3ee702e897a6fe58f68d",
+        "android_client_info": {
+          "package_name": "com.example.duty_track"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyijbcRIpvCO0BD5PZlmvN04NhiMcQ5OQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
