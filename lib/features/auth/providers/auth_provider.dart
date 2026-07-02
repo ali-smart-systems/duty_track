@@ -26,13 +26,21 @@ class AuthNotifier extends StateNotifier<AuthState> {
   void _listenAuthState() {
     _subscription = _repository.authStateChanges().listen((user) async {
       if (user == null) {
-        state = state.copyWith(clearUser: true, clearError: true);
+        state = state.copyWith(
+          isInitialized: true,
+          clearUser: true,
+          clearError: true,
+        );
         return;
       }
 
       final currentUser = await _repository.currentUserData();
 
-      state = state.copyWith(user: currentUser, clearError: true);
+      state = state.copyWith(
+        isInitialized: true,
+        user: currentUser,
+        clearError: true,
+      );
     });
   }
 
@@ -48,7 +56,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         password: password,
       );
 
-      state = state.copyWith(isLoading: false, user: user);
+      state = state.copyWith(isInitialized: true, isLoading: false, user: user);
 
       return true;
     } catch (e) {

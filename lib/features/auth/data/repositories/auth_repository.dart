@@ -46,10 +46,7 @@ class AuthRepository {
       throw Exception('لا يوجد بريد إلكتروني مرتبط بهذا المستخدم.');
     }
 
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+    await _service.signInWithEmailAndPassword(email: email, password: password);
 
     return UserModel.fromMap(data, userDoc.id);
   }

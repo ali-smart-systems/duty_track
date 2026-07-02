@@ -18,6 +18,13 @@ class AuthService {
     return _auth.authStateChanges();
   }
 
+  Future<UserCredential> signInWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) {
+    return _auth.signInWithEmailAndPassword(email: email, password: password);
+  }
+
   Future<UserModel?> getCurrentUserData() async {
     final user = currentUser;
 
