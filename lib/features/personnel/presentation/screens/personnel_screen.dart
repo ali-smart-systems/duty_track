@@ -74,34 +74,45 @@ class _PersonnelScreenState extends ConsumerState<PersonnelScreen> {
             ),
             child: Column(
               children: [
-                _PersonnelProductivityPanel(
-                  searchController: _searchController,
-                  query: query,
-                  filterOptions: filterOptions,
-                  onSearchChanged: ref
-                      .read(personnelQueryProvider.notifier)
-                      .setSearchText,
-                  onRankChanged: ref
-                      .read(personnelQueryProvider.notifier)
-                      .setRank,
-                  onDepartmentChanged: ref
-                      .read(personnelQueryProvider.notifier)
-                      .setDepartment,
-                  onStatusChanged: ref
-                      .read(personnelQueryProvider.notifier)
-                      .setStatus,
-                  onSortFieldChanged: (value) {
-                    if (value == null) return;
-                    ref
-                        .read(personnelQueryProvider.notifier)
-                        .setSortField(value);
-                  },
-                  onSortAscendingChanged: ref
-                      .read(personnelQueryProvider.notifier)
-                      .setSortAscending,
-                  onClearFilters: ref
-                      .read(personnelQueryProvider.notifier)
-                      .clearFilters,
+                Card(
+                  margin: const EdgeInsets.all(12),
+                  child: ExpansionTile(
+                    initiallyExpanded: false,
+                    leading: const Icon(Icons.filter_alt),
+                    title: const Text('البحث والفلاتر'),
+                    childrenPadding: const EdgeInsets.all(8),
+                    children: [
+                      _PersonnelProductivityPanel(
+                        searchController: _searchController,
+                        query: query,
+                        filterOptions: filterOptions,
+                        onSearchChanged: ref
+                            .read(personnelQueryProvider.notifier)
+                            .setSearchText,
+                        onRankChanged: ref
+                            .read(personnelQueryProvider.notifier)
+                            .setRank,
+                        onDepartmentChanged: ref
+                            .read(personnelQueryProvider.notifier)
+                            .setDepartment,
+                        onStatusChanged: ref
+                            .read(personnelQueryProvider.notifier)
+                            .setStatus,
+                        onSortFieldChanged: (value) {
+                          if (value == null) return;
+                          ref
+                              .read(personnelQueryProvider.notifier)
+                              .setSortField(value);
+                        },
+                        onSortAscendingChanged: ref
+                            .read(personnelQueryProvider.notifier)
+                            .setSortAscending,
+                        onClearFilters: ref
+                            .read(personnelQueryProvider.notifier)
+                            .clearFilters,
+                      ),
+                    ],
+                  ),
                 ),
                 Expanded(
                   child: personnelAsync.when(

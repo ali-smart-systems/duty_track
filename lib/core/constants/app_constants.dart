@@ -40,7 +40,18 @@ class AppConstants {
   // =========================
   // Cache
   // =========================
+  static const String serviceLocationsCollection = 'service_locations';
 
+  static const String servicePostsCollection = 'service_posts';
+  static const String shiftsCollection = 'shifts';
+
+  static const String dailyServicesCollection = 'daily_services';
+
+  static const String missionTypesCollection = 'mission_types';
+
+  static const String leaveTypesCollection = 'leave_types';
+
+  static const String culturalProgramsCollection = 'cultural_programs';
   static const Duration splashDuration = Duration(seconds: 2);
 
   static const Duration requestTimeout = Duration(seconds: 30);

@@ -4,6 +4,7 @@ import '../app/app_routes.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/splash_screen.dart';
 import '../features/dashboard/presentation/screens/dashboard_shell.dart';
+import '../features/master_data/presentation/screens/service_locations_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -25,6 +26,11 @@ class AppRouter {
     GoRoute(
       path: AppRoutes.dashboard,
       builder: (context, state) => const DashboardShell(),
+    ),
+
+    GoRoute(
+      path: AppRoutes.serviceLocations,
+      builder: (context, state) => const ServiceLocationsScreen(),
     ),
   ];
 }
