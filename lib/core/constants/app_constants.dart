@@ -12,9 +12,9 @@ class AppConstants {
   // =========================
   // Firestore Collections
   // =========================
-
+  static const ranksCollection = 'ranks';
   static const String usersCollection = 'users';
-
+  static const departmentsCollection = 'departments';
   static const String personnelCollection = 'personnel';
 
   static const String tasksCollection = 'tasks';

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../../core/constants/app_constants.dart';
 import '../models/service_location_model.dart';
 import '../models/service_post_model.dart';
+import '../models/shift_model.dart';
 
 class MasterDataService {
   MasterDataService({FirebaseFirestore? firestore})
@@ -20,6 +21,8 @@ class MasterDataService {
   CollectionReference<Map<String, dynamic>> get _posts =>
       _firestore.collection(AppConstants.servicePostsCollection);
 
+  CollectionReference<Map<String, dynamic>> get _shifts =>
+      _firestore.collection(AppConstants.shiftsCollection);
   // ==========================
   // Service Locations
   // ==========================
@@ -72,7 +75,30 @@ class MasterDataService {
   Future<void> deleteServicePost(String id) async {
     await _posts.doc(id).delete();
   }
+  // ==========================
+  // Shifts
+  // ==========================
 
+  Stream<List<ShiftModel>> getShifts() {
+    return _shifts
+        .orderBy('displayOrder')
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs.map(ShiftModel.fromFirestore).toList(),
+        );
+  }
+
+  Future<void> addShift(ShiftModel shift) async {
+    await _shifts.add(shift.toFirestore());
+  }
+
+  Future<void> updateShift(ShiftModel shift) async {
+    await _shifts.doc(shift.id).update(shift.toFirestore());
+  }
+
+  Future<void> deleteShift(String id) async {
+    await _shifts.doc(id).delete();
+  }
   // ==========================
   // Seed Data
   // ==========================

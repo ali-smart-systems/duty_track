@@ -32,13 +32,11 @@ class _DashboardShellState extends State<DashboardShell> {
 
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentIndex,
-
         onDestinationSelected: (index) {
           setState(() {
             currentIndex = index;
           });
         },
-
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),

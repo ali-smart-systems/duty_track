@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../app/app_routes.dart';
+import '../../../../features/master_data/presentation/screens/master_data_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -51,36 +50,32 @@ class AppDrawer extends StatelessWidget {
             title: const Text('الإعدادات'),
             children: [
               ListTile(
-                leading: const Icon(Icons.location_on),
-                title: const Text('مواقع الخدمة'),
-                onTap: () {
-                  Navigator.of(context).pop(); // إغلاق الـ Drawer
-                  context.push(AppRoutes.serviceLocations);
+                leading: const Icon(Icons.dataset),
+                title: const Text('البيانات الأساسية'),
+                onTap: () async {
+                  Navigator.of(context).pop();
+
+                  await Future.delayed(Duration.zero);
+
+                  if (!context.mounted) return;
+
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const MasterDataScreen()),
+                  );
                 },
-              ),
-              ListTile(leading: Icon(Icons.badge), title: Text('المناصب')),
-              ListTile(leading: Icon(Icons.schedule), title: Text('الورديات')),
-              ListTile(
-                leading: Icon(Icons.workspace_premium),
-                title: Text('الرتب'),
-              ),
-              ListTile(leading: Icon(Icons.apartment), title: Text('الأقسام')),
-              ListTile(
-                leading: Icon(Icons.event_available),
-                title: Text('أنواع الإجازات'),
-              ),
-              ListTile(
-                leading: Icon(Icons.assignment_late),
-                title: Text('أنواع المهام'),
               ),
             ],
           ),
 
           const Divider(),
 
-          const ListTile(
-            leading: Icon(Icons.logout),
-            title: Text('تسجيل الخروج'),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('تسجيل الخروج'),
+            onTap: () {
+              Navigator.pop(context);
+              // TODO: تنفيذ تسجيل الخروج
+            },
           ),
         ],
       ),

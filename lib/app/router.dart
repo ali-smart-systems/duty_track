@@ -5,6 +5,8 @@ import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/splash_screen.dart';
 import '../features/dashboard/presentation/screens/dashboard_shell.dart';
 import '../features/master_data/presentation/screens/service_locations_screen.dart';
+import '../features/master_data/presentation/screens/service_posts_locations_screen.dart';
+import '../features/master_data/presentation/screens/shifts_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -15,6 +17,16 @@ class AppRouter {
   );
 
   static final routes = [
+    GoRoute(
+      path: AppRoutes.shifts,
+      builder: (context, state) => const ShiftsScreen(),
+    ),
+
+    GoRoute(
+      path: AppRoutes.servicePosts,
+      builder: (context, state) => const ServicePostsLocationsScreen(),
+    ),
+
     GoRoute(
       path: AppRoutes.splash,
       builder: (context, state) => const SplashScreen(),
