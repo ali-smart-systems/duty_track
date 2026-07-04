@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/master_data_provider.dart';
 import 'add_rank_screen.dart';
+import '../../../../shared/master_data/dialogs/delete_dialog.dart';
+import '../../../../shared/master_data/widgets/empty_master_data.dart';
+import '../../../../shared/master_data/widgets/loading_master_data.dart';
+import '../../../../shared/master_data/widgets/master_data_card.dart';
 
 class RanksScreen extends ConsumerWidget {
   const RanksScreen({super.key});
@@ -26,15 +30,13 @@ class RanksScreen extends ConsumerWidget {
           },
         ),
         body: ranksAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const LoadingMasterData(),
 
           error: (error, stackTrace) => Center(child: Text(error.toString())),
 
           data: (ranks) {
             if (ranks.isEmpty) {
-              return const Center(
-                child: Text('لا توجد رتب', style: TextStyle(fontSize: 18)),
-              );
+              return const EmptyMasterData(message: 'لا توجد رتب');
             }
 
             return ListView.separated(
@@ -44,65 +46,34 @@ class RanksScreen extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final rank = ranks[index];
 
-                return Card(
-                  elevation: 2,
-                  child: ListTile(
-                    leading: CircleAvatar(child: Text('${index + 1}')),
+                return MasterDataCard(
+                  title: rank.name,
+                  subtitle: rank.isActive ? 'نشطة' : 'غير نشطة',
 
-                    title: Text(rank.name),
+                  leading: CircleAvatar(child: Text('${index + 1}')),
 
-                    subtitle: Text(rank.isActive ? 'نشطة' : 'غير نشطة'),
+                  onEdit: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AddRankScreen(rank: rank),
+                      ),
+                    );
+                  },
 
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (value) async {
-                        switch (value) {
-                          case 'edit':
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => AddRankScreen(rank: rank),
-                              ),
-                            );
-                            break;
+                  onDelete: () async {
+                    final result = await DeleteDialog.show(
+                      context,
+                      title: 'حذف الرتبة',
+                      message: 'هل تريد حذف "${rank.name}"؟',
+                    );
 
-                          case 'delete':
-                            final result = await showDialog<bool>(
-                              context: context,
-                              builder: (_) => AlertDialog(
-                                title: const Text('حذف الرتبة'),
-                                content: Text('هل تريد حذف "${rank.name}"؟'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context, false);
-                                    },
-                                    child: const Text('إلغاء'),
-                                  ),
-                                  FilledButton(
-                                    onPressed: () {
-                                      Navigator.pop(context, true);
-                                    },
-                                    child: const Text('حذف'),
-                                  ),
-                                ],
-                              ),
-                            );
-
-                            if (result == true) {
-                              await ref
-                                  .read(masterDataRepositoryProvider)
-                                  .deleteRank(rank.id);
-                            }
-
-                            break;
-                        }
-                      },
-                      itemBuilder: (_) => const [
-                        PopupMenuItem(value: 'edit', child: Text('تعديل')),
-                        PopupMenuItem(value: 'delete', child: Text('حذف')),
-                      ],
-                    ),
-                  ),
+                    if (result) {
+                      await ref
+                          .read(masterDataRepositoryProvider)
+                          .deleteRank(rank.id);
+                    }
+                  },
                 );
               },
             );

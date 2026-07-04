@@ -1,18 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/models/department_model.dart';
+import '../data/models/leave_type_model.dart';
+import '../data/models/rank_model.dart';
 import '../data/models/service_location_model.dart';
 import '../data/models/service_post_model.dart';
 import '../data/models/shift_model.dart';
 import '../data/repositories/master_data_repository.dart';
-import '../data/models/rank_model.dart';
-import '../data/models/department_model.dart';
+import '../data/models/mission_type_model.dart';
 
 final masterDataRepositoryProvider = Provider<MasterDataRepository>((ref) {
   return MasterDataRepository();
 });
-final departmentsProvider = StreamProvider<List<DepartmentModel>>((ref) {
-  return ref.watch(masterDataRepositoryProvider).getDepartments();
+
+final missionTypesProvider = StreamProvider<List<MissionTypeModel>>((ref) {
+  return ref.watch(masterDataRepositoryProvider).getMissionTypes();
 });
+
 // ==========================
 // Service Locations
 // ==========================
@@ -22,9 +26,7 @@ final serviceLocationsProvider = StreamProvider<List<ServiceLocationModel>>((
 ) {
   return ref.watch(masterDataRepositoryProvider).getServiceLocations();
 });
-final ranksProvider = StreamProvider<List<RankModel>>((ref) {
-  return ref.watch(masterDataRepositoryProvider).getRanks();
-});
+
 // ==========================
 // Service Posts
 // ==========================
@@ -42,6 +44,30 @@ final servicePostsProvider =
 
 final shiftsProvider = StreamProvider<List<ShiftModel>>((ref) {
   return ref.watch(masterDataRepositoryProvider).getShifts();
+});
+
+// ==========================
+// Ranks
+// ==========================
+
+final ranksProvider = StreamProvider<List<RankModel>>((ref) {
+  return ref.watch(masterDataRepositoryProvider).getRanks();
+});
+
+// ==========================
+// Departments
+// ==========================
+
+final departmentsProvider = StreamProvider<List<DepartmentModel>>((ref) {
+  return ref.watch(masterDataRepositoryProvider).getDepartments();
+});
+
+// ==========================
+// Leave Types
+// ==========================
+
+final leaveTypesProvider = StreamProvider<List<LeaveTypeModel>>((ref) {
+  return ref.watch(masterDataRepositoryProvider).getLeaveTypes();
 });
 
 // ==========================

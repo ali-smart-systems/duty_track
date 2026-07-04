@@ -1,25 +1,36 @@
+import '../models/department_model.dart';
+import '../models/leave_type_model.dart';
+import '../models/rank_model.dart';
 import '../models/service_location_model.dart';
 import '../models/service_post_model.dart';
-import '../seed/service_locations_seed.dart';
-import '../services/master_data_service.dart';
 import '../models/shift_model.dart';
-import '../models/rank_model.dart';
-import '../services/rank_service.dart';
-import '../models/department_model.dart';
+import '../seed/service_locations_seed.dart';
 import '../services/department_service.dart';
+import '../services/leave_type_service.dart';
+import '../services/master_data_service.dart';
+import '../services/rank_service.dart';
+import '../models/mission_type_model.dart';
+import '../services/mission_type_service.dart';
 
 class MasterDataRepository {
   MasterDataRepository({
     MasterDataService? service,
     RankService? rankService,
     DepartmentService? departmentService,
+    LeaveTypeService? leaveTypeService,
+    MissionTypeService? missionTypeService,
   }) : _service = service ?? MasterDataService(),
        _rankService = rankService ?? RankService(),
-       _departmentService = departmentService ?? DepartmentService();
+       _departmentService = departmentService ?? DepartmentService(),
+       _leaveTypeService = leaveTypeService ?? LeaveTypeService(),
+       _missionTypeService = missionTypeService ?? MissionTypeService();
 
+  final MissionTypeService _missionTypeService;
   final MasterDataService _service;
   final RankService _rankService;
   final DepartmentService _departmentService;
+  final LeaveTypeService _leaveTypeService;
+
   // ==========================
   // Service Locations
   // ==========================
@@ -73,6 +84,7 @@ class MasterDataRepository {
   Future<void> deleteServicePost(String id) {
     return _service.deleteServicePost(id);
   }
+
   // ==========================
   // Shifts
   // ==========================
@@ -112,6 +124,7 @@ class MasterDataRepository {
   Future<void> deleteRank(String id) {
     return _rankService.deleteRank(id);
   }
+
   // ==========================
   // Departments
   // ==========================
@@ -130,5 +143,45 @@ class MasterDataRepository {
 
   Future<void> deleteDepartment(String id) {
     return _departmentService.deleteDepartment(id);
+  }
+
+  // ==========================
+  // Leave Types
+  // ==========================
+
+  Stream<List<LeaveTypeModel>> getLeaveTypes() {
+    return _leaveTypeService.getLeaveTypes();
+  }
+
+  Future<void> addLeaveType(LeaveTypeModel leaveType) {
+    return _leaveTypeService.addLeaveType(leaveType);
+  }
+
+  Future<void> updateLeaveType(LeaveTypeModel leaveType) {
+    return _leaveTypeService.updateLeaveType(leaveType);
+  }
+
+  Future<void> deleteLeaveType(String id) {
+    return _leaveTypeService.deleteLeaveType(id);
+  }
+
+  // ==========================
+  // Mission Types
+  // ==========================
+
+  Stream<List<MissionTypeModel>> getMissionTypes() {
+    return _missionTypeService.getMissionTypes();
+  }
+
+  Future<void> addMissionType(MissionTypeModel missionType) {
+    return _missionTypeService.addMissionType(missionType);
+  }
+
+  Future<void> updateMissionType(MissionTypeModel missionType) {
+    return _missionTypeService.updateMissionType(missionType);
+  }
+
+  Future<void> deleteMissionType(String id) {
+    return _missionTypeService.deleteMissionType(id);
   }
 }
