@@ -8,7 +8,9 @@ class AppConstants {
   static const String appName = 'DUTY TRACK';
 
   static const String appVersion = '1.0.0';
+  static const dutiesCollection = 'duties';
 
+  static const dutyPersonnelCollection = 'duty_personnel';
   // =========================
   // Firestore Collections
   // =========================

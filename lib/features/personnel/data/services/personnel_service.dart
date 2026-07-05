@@ -31,35 +31,13 @@ class PersonnelService {
   Future<String> addPersonnel(PersonnelModel personnel) async {
     if (personnel.id.isNotEmpty) {
       await _collection.doc(personnel.id).set(personnel.toFirestore());
+
       return personnel.id;
     }
 
     final document = await _collection.add(personnel.toFirestore());
+
     return document.id;
-  }
-
-  Future<bool> militaryNumberExists(
-    String militaryNumber, {
-    String? excludePersonnelId,
-  }) async {
-    final snapshot = await _collection
-        .where('militaryNumber', isEqualTo: militaryNumber)
-        .limit(1)
-        .get();
-
-    return snapshot.docs.any((doc) => doc.id != excludePersonnelId);
-  }
-
-  Future<bool> nationalIdExists(
-    String nationalId, {
-    String? excludePersonnelId,
-  }) async {
-    final snapshot = await _collection
-        .where('nationalId', isEqualTo: nationalId)
-        .limit(1)
-        .get();
-
-    return snapshot.docs.any((doc) => doc.id != excludePersonnelId);
   }
 
   Future<void> updatePersonnel(PersonnelModel personnel) async {
@@ -68,5 +46,39 @@ class PersonnelService {
 
   Future<void> deletePersonnel(String id) async {
     await _collection.doc(id).delete();
+  }
+
+  Future<bool> militaryNumberExists(
+    String militaryNumber, {
+    String? excludePersonnelId,
+  }) async {
+    final snapshot = await _collection
+        .where('militaryNumber', isEqualTo: militaryNumber)
+        .get();
+
+    for (final doc in snapshot.docs) {
+      if (doc.id != excludePersonnelId) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  Future<bool> nationalIdExists(
+    String nationalId, {
+    String? excludePersonnelId,
+  }) async {
+    final snapshot = await _collection
+        .where('nationalId', isEqualTo: nationalId)
+        .get();
+
+    for (final doc in snapshot.docs) {
+      if (doc.id != excludePersonnelId) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

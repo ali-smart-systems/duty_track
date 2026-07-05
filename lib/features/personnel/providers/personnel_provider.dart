@@ -34,6 +34,7 @@ final filteredPersonnelListProvider = FutureProvider<List<PersonnelModel>>((
 
     final matchesRank =
         query.rank == null || query.rank!.isEmpty || person.rank == query.rank;
+
     final matchesDepartment =
         query.department == null ||
         query.department!.isEmpty ||
@@ -71,6 +72,7 @@ final personnelFilterOptionsProvider = FutureProvider<PersonnelFilterOptions>((
 
   return PersonnelFilterOptions(
     ranks: _uniqueSortedValues(personnel.map((person) => person.rank)),
+
     departments: _uniqueSortedValues(
       personnel.map((person) => person.department),
     ),

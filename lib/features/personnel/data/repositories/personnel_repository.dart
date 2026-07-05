@@ -19,6 +19,14 @@ class PersonnelRepository {
     return _service.addPersonnel(personnel);
   }
 
+  Future<void> updatePersonnel(PersonnelModel personnel) {
+    return _service.updatePersonnel(personnel);
+  }
+
+  Future<void> deletePersonnel(String id) {
+    return _service.deletePersonnel(id);
+  }
+
   Future<bool> militaryNumberExists(
     String militaryNumber, {
     String? excludePersonnelId,
@@ -37,13 +45,5 @@ class PersonnelRepository {
       nationalId,
       excludePersonnelId: excludePersonnelId,
     );
-  }
-
-  Future<void> updatePersonnel(PersonnelModel personnel) {
-    return _service.updatePersonnel(personnel);
-  }
-
-  Future<void> deletePersonnel(String id) {
-    return _service.deletePersonnel(id);
   }
 }
