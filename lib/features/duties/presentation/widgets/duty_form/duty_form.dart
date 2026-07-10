@@ -196,13 +196,13 @@ class _DutyFormState extends ConsumerState<DutyForm> {
     final now = DateTime.now();
 
     final duty = DutyModel(
-      id: const Uuid().v4(),
+      id: widget.duty?.id ?? const Uuid().v4(),
       date: _date!,
       shiftId: _shift!,
       serviceLocationId: _location!,
       servicePostId: _post!,
       notes: _notesController.text.trim(),
-      createdAt: now,
+      createdAt: widget.duty?.createdAt ?? now,
       updatedAt: now,
     );
     final dutyPersonnel = _personnel.map((person) {

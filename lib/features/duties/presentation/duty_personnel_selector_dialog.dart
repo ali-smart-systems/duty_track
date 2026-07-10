@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../personnel/providers/personnel_provider.dart';
 import '../data/models/duty_personnel_view_model.dart';
+import '../../master_data/providers/master_data_provider.dart';
 
 class DutyPersonnelSelectorDialog extends ConsumerStatefulWidget {
   const DutyPersonnelSelectorDialog({
@@ -31,6 +32,8 @@ class _DutyPersonnelSelectorDialogState
   Widget build(BuildContext context) {
     final personnelAsync = ref.watch(personnelListProvider);
 
+    final locationsAsync = ref.watch(serviceLocationsProvider);
+
     return AlertDialog(
       title: const Text("إضافة فرد للمناوبة"),
 
@@ -44,14 +47,28 @@ class _DutyPersonnelSelectorDialogState
           error: (error, stackTrace) => const Center(child: Text("حدث خطأ")),
 
           data: (personnel) {
+            final search = _searchController.text.trim().toLowerCase();
+
             final availablePersonnel = personnel.where((person) {
-              return !widget.selectedPersonnelIds.contains(person.id);
+              if (widget.selectedPersonnelIds.contains(person.id)) {
+                return false;
+              }
+
+              if (search.isEmpty) {
+                return true;
+              }
+
+              return person.fullName.toLowerCase().contains(search) ||
+                  person.militaryNumber.toLowerCase().contains(search);
             }).toList();
 
             return Column(
               children: [
                 TextField(
                   controller: _searchController,
+                  onChanged: (_) {
+                    setState(() {});
+                  },
                   decoration: const InputDecoration(
                     hintText: "بحث...",
                     prefixIcon: Icon(Icons.search),
@@ -67,6 +84,38 @@ class _DutyPersonnelSelectorDialogState
                     itemBuilder: (context, index) {
                       final person = availablePersonnel[index];
 
+                      final locationName = locationsAsync.when(
+                        data: (items) {
+                          final location = items.where(
+                            (e) => e.id == person.serviceLocationId,
+                          );
+
+                          return location.isEmpty
+                              ? person.serviceLocationId
+                              : location.first.name;
+                        },
+                        loading: () => "...",
+                        error: (_, _) => person.serviceLocationId,
+                      );
+
+                      final postsAsync = ref.watch(
+                        servicePostsProvider(person.serviceLocationId),
+                      );
+
+                      final postName = postsAsync.when(
+                        data: (items) {
+                          final post = items.where(
+                            (e) => e.id == person.servicePostId,
+                          );
+
+                          return post.isEmpty
+                              ? person.servicePostId
+                              : post.first.name;
+                        },
+                        loading: () => "...",
+                        error: (_, _) => person.servicePostId,
+                      );
+
                       return RadioListTile<String>(
                         value: person.id,
 
@@ -80,7 +129,13 @@ class _DutyPersonnelSelectorDialogState
 
                         title: Text(person.fullName),
 
-                        subtitle: Text("${person.rank} • ${person.department}"),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("${person.rank} • ${person.department}"),
+                            Text("$locationName • $postName"),
+                          ],
+                        ),
                       );
                     },
                   ),
