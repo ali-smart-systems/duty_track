@@ -58,7 +58,8 @@ class DutiesScreen extends ConsumerWidget {
             itemCount: items.length,
             separatorBuilder: (context, index) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
-              final duty = items[index];
+              final dutyView = items[index];
+              final duty = dutyView.duty;
 
               return Card(
                 elevation: 2,
@@ -80,7 +81,7 @@ class DutiesScreen extends ConsumerWidget {
                           children: [
                             const Icon(Icons.schedule, size: 18),
                             const SizedBox(width: 6),
-                            Expanded(child: Text(duty.shiftId)),
+                            Expanded(child: Text(dutyView.shiftName)),
                           ],
                         ),
 
@@ -90,7 +91,7 @@ class DutiesScreen extends ConsumerWidget {
                           children: [
                             const Icon(Icons.location_on, size: 18),
                             const SizedBox(width: 6),
-                            Expanded(child: Text(duty.serviceLocationId)),
+                            Expanded(child: Text(dutyView.locationName)),
                           ],
                         ),
 
@@ -100,7 +101,7 @@ class DutiesScreen extends ConsumerWidget {
                           children: [
                             const Icon(Icons.security, size: 18),
                             const SizedBox(width: 6),
-                            Expanded(child: Text(duty.servicePostId)),
+                            Expanded(child: Text(dutyView.postName)),
                           ],
                         ),
                       ],

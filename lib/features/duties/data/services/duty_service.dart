@@ -36,6 +36,34 @@ class DutyService {
     return DutyModel.fromFirestore(snapshot);
   }
 
+  Future<bool> dutyExists({
+    required DateTime date,
+    required String shiftId,
+    required String serviceLocationId,
+    required String servicePostId,
+    String? excludeDutyId,
+  }) async {
+    final dateKey =
+        "${date.year.toString().padLeft(4, '0')}-"
+        "${date.month.toString().padLeft(2, '0')}-"
+        "${date.day.toString().padLeft(2, '0')}";
+
+    final snapshot = await _duties
+        .where('dateKey', isEqualTo: dateKey)
+        .where('shiftId', isEqualTo: shiftId)
+        .where('serviceLocationId', isEqualTo: serviceLocationId)
+        .where('servicePostId', isEqualTo: servicePostId)
+        .get();
+
+    for (final doc in snapshot.docs) {
+      if (doc.id != excludeDutyId) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   Future<String> addDuty(DutyModel duty) async {
     if (duty.id.isNotEmpty) {
       await _duties.doc(duty.id).set(duty.toFirestore());

@@ -3,7 +3,8 @@ import 'package:intl/intl.dart' as intl;
 
 import '../../data/models/personnel_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../master_data/providers/master_data_provider.dart';
+
+import '../../providers/personnel_provider.dart';
 
 class PersonnelDetailsScreen extends ConsumerWidget {
   PersonnelDetailsScreen({super.key, required this.personnel})
@@ -18,115 +19,113 @@ class PersonnelDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final locationsAsync = ref.watch(serviceLocationsProvider);
-
-    final postsAsync = ref.watch(
-      servicePostsProvider(personnel.serviceLocationId),
-    );
-
-    final locationName = locationsAsync.when(
-      data: (items) {
-        final location = items.where(
-          (e) => e.id == personnel.serviceLocationId,
-        );
-
-        return location.isEmpty
-            ? personnel.serviceLocationId
-            : location.first.name;
-      },
-      loading: () => '...',
-      error: (_, _) => personnel.serviceLocationId,
-    );
-
-    final postName = postsAsync.when(
-      data: (items) {
-        final post = items.where((e) => e.id == personnel.servicePostId);
-
-        return post.isEmpty ? personnel.servicePostId : post.first.name;
-      },
-      loading: () => '...',
-      error: (_, _) => personnel.servicePostId,
-    );
-
+    final personnelView = ref.watch(personnelViewByIdProvider(personnel.id));
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(title: const Text('تفاصيل الموظف')),
-        body: SafeArea(
-          child: Align(
-            alignment: AlignmentDirectional.topCenter,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _maxContentWidth),
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _DetailsSection(
-                    title: 'البيانات الأساسية',
+        body: personnelView.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+
+          error: (error, _) => Center(child: Text(error.toString())),
+
+          data: (view) {
+            if (view == null) {
+              return const Center(child: Text('الموظف غير موجود'));
+            }
+
+            return SafeArea(
+              child: Align(
+                alignment: AlignmentDirectional.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: _maxContentWidth),
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
                     children: [
-                      _DetailTile(label: 'المعرف', value: personnel.id),
-                      _DetailTile(
-                        label: 'الرقم العسكري',
-                        value: personnel.militaryNumber,
+                      _DetailsSection(
+                        title: 'البيانات الأساسية',
+                        children: [
+                          _DetailTile(label: 'المعرف', value: personnel.id),
+                          _DetailTile(
+                            label: 'الرقم العسكري',
+                            value: personnel.militaryNumber,
+                          ),
+                          _DetailTile(
+                            label: 'الاسم الكامل',
+                            value: personnel.fullName,
+                          ),
+                          _DetailTile(label: 'الرتبة', value: view.rankName),
+                          _DetailTile(
+                            label: 'القسم',
+                            value: view.departmentName,
+                          ),
+                          _DetailTile(
+                            label: 'موقع الخدمة',
+                            value: view.serviceLocationName,
+                          ),
+                          _DetailTile(
+                            label: 'نقطة الخدمة',
+                            value: view.servicePostName,
+                          ),
+                        ],
                       ),
-                      _DetailTile(
-                        label: 'الاسم الكامل',
-                        value: personnel.fullName,
+                      const SizedBox(height: 12),
+                      _DetailsSection(
+                        title: 'بيانات التواصل والهوية',
+                        children: [
+                          _DetailTile(
+                            label: 'رقم الهاتف',
+                            value: personnel.phone,
+                          ),
+                          _DetailTile(
+                            label: 'البريد الإلكتروني',
+                            value: personnel.email,
+                          ),
+                          _DetailTile(
+                            label: 'الرقم الوطني',
+                            value: personnel.nationalId,
+                          ),
+                        ],
                       ),
-                      _DetailTile(label: 'الرتبة', value: personnel.rank),
-                      _DetailTile(label: 'القسم', value: personnel.department),
-                      _DetailTile(label: 'موقع الخدمة', value: locationName),
-                      _DetailTile(label: 'نقطة الخدمة', value: postName),
-                      _DetailTile(label: 'الحالة', value: personnel.status),
+                      const SizedBox(height: 12),
+                      _DetailsSection(
+                        title: 'التواريخ',
+                        children: [
+                          _DetailTile(
+                            label: 'تاريخ الميلاد',
+                            value: _formatDate(personnel.birthDate),
+                          ),
+                          _DetailTile(
+                            label: 'تاريخ التعيين',
+                            value: _formatDate(personnel.hireDate),
+                          ),
+                          _DetailTile(
+                            label: 'تاريخ الإنشاء',
+                            value: _dateTimeFormatter.format(
+                              personnel.createdAt,
+                            ),
+                          ),
+                          _DetailTile(
+                            label: 'آخر تحديث',
+                            value: _dateTimeFormatter.format(
+                              personnel.updatedAt,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      _DetailsSection(
+                        title: 'ملاحظات',
+                        children: [
+                          _DetailTile(label: 'ملاحظات', value: personnel.notes),
+                        ],
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  _DetailsSection(
-                    title: 'بيانات التواصل والهوية',
-                    children: [
-                      _DetailTile(label: 'رقم الهاتف', value: personnel.phone),
-                      _DetailTile(
-                        label: 'البريد الإلكتروني',
-                        value: personnel.email,
-                      ),
-                      _DetailTile(
-                        label: 'الرقم الوطني',
-                        value: personnel.nationalId,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  _DetailsSection(
-                    title: 'التواريخ',
-                    children: [
-                      _DetailTile(
-                        label: 'تاريخ الميلاد',
-                        value: _formatDate(personnel.birthDate),
-                      ),
-                      _DetailTile(
-                        label: 'تاريخ التعيين',
-                        value: _formatDate(personnel.hireDate),
-                      ),
-                      _DetailTile(
-                        label: 'تاريخ الإنشاء',
-                        value: _dateTimeFormatter.format(personnel.createdAt),
-                      ),
-                      _DetailTile(
-                        label: 'آخر تحديث',
-                        value: _dateTimeFormatter.format(personnel.updatedAt),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  _DetailsSection(
-                    title: 'ملاحظات',
-                    children: [
-                      _DetailTile(label: 'ملاحظات', value: personnel.notes),
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

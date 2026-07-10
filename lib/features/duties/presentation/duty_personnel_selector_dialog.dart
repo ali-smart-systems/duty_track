@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../personnel/providers/personnel_provider.dart';
 import '../data/models/duty_personnel_view_model.dart';
-import '../../master_data/providers/master_data_provider.dart';
 
 class DutyPersonnelSelectorDialog extends ConsumerStatefulWidget {
   const DutyPersonnelSelectorDialog({
@@ -30,9 +29,7 @@ class _DutyPersonnelSelectorDialogState
 
   @override
   Widget build(BuildContext context) {
-    final personnelAsync = ref.watch(personnelListProvider);
-
-    final locationsAsync = ref.watch(serviceLocationsProvider);
+    final personnelAsync = ref.watch(personnelViewListProvider);
 
     return AlertDialog(
       title: const Text("إضافة فرد للمناوبة"),
@@ -50,7 +47,7 @@ class _DutyPersonnelSelectorDialogState
             final search = _searchController.text.trim().toLowerCase();
 
             final availablePersonnel = personnel.where((person) {
-              if (widget.selectedPersonnelIds.contains(person.id)) {
+              if (widget.selectedPersonnelIds.contains(person.personnel.id)) {
                 return false;
               }
 
@@ -58,8 +55,10 @@ class _DutyPersonnelSelectorDialogState
                 return true;
               }
 
-              return person.fullName.toLowerCase().contains(search) ||
-                  person.militaryNumber.toLowerCase().contains(search);
+              return person.personnel.fullName.toLowerCase().contains(search) ||
+                  person.personnel.militaryNumber.toLowerCase().contains(
+                    search,
+                  );
             }).toList();
 
             return Column(
@@ -84,40 +83,8 @@ class _DutyPersonnelSelectorDialogState
                     itemBuilder: (context, index) {
                       final person = availablePersonnel[index];
 
-                      final locationName = locationsAsync.when(
-                        data: (items) {
-                          final location = items.where(
-                            (e) => e.id == person.serviceLocationId,
-                          );
-
-                          return location.isEmpty
-                              ? person.serviceLocationId
-                              : location.first.name;
-                        },
-                        loading: () => "...",
-                        error: (_, _) => person.serviceLocationId,
-                      );
-
-                      final postsAsync = ref.watch(
-                        servicePostsProvider(person.serviceLocationId),
-                      );
-
-                      final postName = postsAsync.when(
-                        data: (items) {
-                          final post = items.where(
-                            (e) => e.id == person.servicePostId,
-                          );
-
-                          return post.isEmpty
-                              ? person.servicePostId
-                              : post.first.name;
-                        },
-                        loading: () => "...",
-                        error: (_, _) => person.servicePostId,
-                      );
-
                       return RadioListTile<String>(
-                        value: person.id,
+                        value: person.personnel.id,
 
                         groupValue: _selectedPersonnelId,
 
@@ -127,13 +94,17 @@ class _DutyPersonnelSelectorDialogState
                           });
                         },
 
-                        title: Text(person.fullName),
+                        title: Text(person.personnel.fullName),
 
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("${person.rank} • ${person.department}"),
-                            Text("$locationName • $postName"),
+                            Text(
+                              "${person.rankName} • ${person.departmentName}",
+                            ),
+                            Text(
+                              "${person.serviceLocationName} • ${person.servicePostName}",
+                            ),
                           ],
                         ),
                       );
@@ -160,19 +131,19 @@ class _DutyPersonnelSelectorDialogState
               return;
             }
 
-            final personnelState = ref.read(personnelListProvider);
+            final personnelState = ref.read(personnelViewListProvider);
 
             personnelState.whenData((personnel) {
               final person = personnel.firstWhere(
-                (e) => e.id == _selectedPersonnelId,
+                (e) => e.personnel.id == _selectedPersonnelId,
               );
 
               Navigator.pop(
                 context,
                 DutyPersonnelViewModel(
-                  personnelId: person.id,
-                  fullName: person.fullName,
-                  rank: person.rank,
+                  personnelId: person.personnel.id,
+                  fullName: person.personnel.fullName,
+                  rank: person.rankName,
                   role: _role,
                   isLeader: _isLeader,
                 ),

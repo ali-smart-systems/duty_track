@@ -2,6 +2,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/models/personnel_model.dart';
 import '../data/repositories/personnel_repository.dart';
+import '../data/models/personnel_view_model.dart';
+
+final personnelViewListProvider = FutureProvider<List<PersonnelViewModel>>((
+  ref,
+) {
+  final repository = ref.watch(personnelRepositoryProvider);
+
+  return repository.getPersonnelViewModels();
+});
 
 final personnelRepositoryProvider = Provider<PersonnelRepository>((ref) {
   return PersonnelRepository();
@@ -88,6 +97,13 @@ final personnelByIdProvider = FutureProvider.family<PersonnelModel?, String>((
 
   return repository.getPersonnelById(id);
 });
+
+final personnelViewByIdProvider =
+    FutureProvider.family<PersonnelViewModel?, String>((ref, id) {
+      final repository = ref.watch(personnelRepositoryProvider);
+
+      return repository.getPersonnelViewModelById(id);
+    });
 
 enum PersonnelSortField { fullName, militaryNumber, hireDate }
 

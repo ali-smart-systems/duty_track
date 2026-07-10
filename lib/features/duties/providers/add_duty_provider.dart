@@ -4,6 +4,7 @@ import '../data/models/duty_model.dart';
 import 'duty_list_provider.dart';
 import 'duty_repository_provider.dart';
 import '../data/models/duty_personnel_model.dart';
+import 'package:flutter/foundation.dart';
 
 final addDutyProvider =
     StateNotifierProvider.autoDispose<AddDutyNotifier, AddDutyState>((ref) {
@@ -31,6 +32,21 @@ class AddDutyNotifier extends StateNotifier<AddDutyState> {
 
       final repository = _ref.read(dutyRepositoryProvider);
 
+      final dutyExists = await repository.dutyExists(
+        date: duty.date,
+        shiftId: duty.shiftId,
+        serviceLocationId: duty.serviceLocationId,
+        servicePostId: duty.servicePostId,
+      );
+
+      if (dutyExists) {
+        state = const AddDutyState(
+          error:
+              'توجد مناوبة مسجلة مسبقًا لنفس التاريخ والوردية والموقع ونقطة الخدمة',
+        );
+        return;
+      }
+
       final dutyId = await repository.addDuty(duty);
 
       for (final item in personnel) {
@@ -40,7 +56,9 @@ class AddDutyNotifier extends StateNotifier<AddDutyState> {
       _ref.invalidate(dutyListProvider);
 
       state = const AddDutyState(success: true);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrintStack(stackTrace: stackTrace);
+
       state = AddDutyState(error: e.toString());
     }
   }

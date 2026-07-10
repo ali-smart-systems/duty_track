@@ -4,6 +4,7 @@ class DutyModel {
   const DutyModel({
     required this.id,
     required this.date,
+    required this.dateKey,
     required this.shiftId,
     required this.serviceLocationId,
     required this.servicePostId,
@@ -16,6 +17,8 @@ class DutyModel {
 
   /// تاريخ المناوبة
   final DateTime date;
+
+  final String dateKey;
 
   /// الوردية
   final String shiftId;
@@ -35,6 +38,7 @@ class DutyModel {
   DutyModel copyWith({
     String? id,
     DateTime? date,
+    String? dateKey,
     String? shiftId,
     String? serviceLocationId,
     String? servicePostId,
@@ -45,6 +49,7 @@ class DutyModel {
     return DutyModel(
       id: id ?? this.id,
       date: date ?? this.date,
+      dateKey: dateKey ?? this.dateKey,
       shiftId: shiftId ?? this.shiftId,
       serviceLocationId: serviceLocationId ?? this.serviceLocationId,
       servicePostId: servicePostId ?? this.servicePostId,
@@ -58,6 +63,7 @@ class DutyModel {
     return DutyModel(
       id: map['id'] ?? '',
       date: _dateTimeFromValue(map['date']) ?? DateTime.now(),
+      dateKey: map['dateKey'] ?? '',
       shiftId: map['shiftId'] ?? '',
       serviceLocationId: map['serviceLocationId'] ?? '',
       servicePostId: map['servicePostId'] ?? '',
@@ -79,6 +85,7 @@ class DutyModel {
     return {
       'id': id,
       'date': Timestamp.fromDate(date),
+      'dateKey': dateKey,
       'shiftId': shiftId,
       'serviceLocationId': serviceLocationId,
       'servicePostId': servicePostId,

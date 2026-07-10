@@ -6,7 +6,8 @@ import '../../providers/personnel_provider.dart';
 import 'add_personnel_screen.dart';
 import 'edit_personnel_screen.dart';
 import 'personnel_details_screen.dart';
-import '../../../master_data/providers/master_data_provider.dart';
+
+import '../../data/models/personnel_view_model.dart';
 
 class PersonnelScreen extends ConsumerStatefulWidget {
   const PersonnelScreen({super.key});
@@ -36,7 +37,7 @@ class _PersonnelScreenState extends ConsumerState<PersonnelScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final personnelAsync = ref.watch(filteredPersonnelListProvider);
+    final personnelAsync = ref.watch(personnelViewListProvider);
     final query = ref.watch(personnelQueryProvider);
     final filterOptions = ref.watch(personnelFilterOptionsProvider);
     final deleteState = ref.watch(deletePersonnelProvider);
@@ -164,24 +165,25 @@ class _PersonnelScreenState extends ConsumerState<PersonnelScreen> {
     BuildContext context,
     WidgetRef ref,
     _PersonnelAction action,
-    PersonnelModel personnel,
+    PersonnelViewModel personnel,
   ) {
     switch (action) {
       case _PersonnelAction.view:
         Navigator.of(context).push(
           MaterialPageRoute<void>(
-            builder: (context) => PersonnelDetailsScreen(personnel: personnel),
+            builder: (context) =>
+                PersonnelDetailsScreen(personnel: personnel.personnel),
           ),
         );
       case _PersonnelAction.edit:
         Navigator.of(context).push(
           MaterialPageRoute<void>(
             builder: (context) =>
-                EditPersonnelScreen(personnelId: personnel.id),
+                EditPersonnelScreen(personnelId: personnel.personnel.id),
           ),
         );
       case _PersonnelAction.delete:
-        _showDeleteConfirmationDialog(context, ref, personnel);
+        _showDeleteConfirmationDialog(context, ref, personnel.personnel);
     }
   }
 
@@ -232,9 +234,9 @@ class _PersonnelList extends StatelessWidget {
     required this.onActionSelected,
   });
 
-  final List<PersonnelModel> personnel;
+  final List<PersonnelViewModel> personnel;
   final bool isDeleting;
-  final void Function(_PersonnelAction action, PersonnelModel personnel)
+  final void Function(_PersonnelAction action, PersonnelViewModel personnel)
   onActionSelected;
 
   @override
@@ -457,48 +459,17 @@ class _PersonnelCard extends ConsumerWidget {
     required this.onActionSelected,
   });
 
-  final PersonnelModel personnel;
+  final PersonnelViewModel personnel;
   final bool isDeleting;
-  final void Function(_PersonnelAction action, PersonnelModel personnel)
+  final void Function(_PersonnelAction action, PersonnelViewModel personnel)
   onActionSelected;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final locationsAsync = ref.watch(serviceLocationsProvider);
-
-    final postsAsync = ref.watch(
-      servicePostsProvider(personnel.serviceLocationId),
-    );
-
-    final locationName = locationsAsync.when(
-      data: (items) {
-        final location = items.where(
-          (e) => e.id == personnel.serviceLocationId,
-        );
-
-        return location.isEmpty
-            ? personnel.serviceLocationId
-            : location.first.name;
-      },
-      loading: () => '...',
-      error: (_, _) => personnel.serviceLocationId,
-    );
-
-    final postName = postsAsync.when(
-      data: (items) {
-        final post = items.where((e) => e.id == personnel.servicePostId);
-
-        return post.isEmpty ? personnel.servicePostId : post.first.name;
-      },
-      loading: () => '...',
-      error: (_, _) => personnel.servicePostId,
-    );
-
     return Card(
       clipBehavior: Clip.antiAlias,
       child: ListTile(
         title: Text(
-          personnel.fullName,
+          personnel.personnel.fullName,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.titleMedium,
@@ -509,21 +480,18 @@ class _PersonnelCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                personnel.rank,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                personnel.department,
+                personnel.rankName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
 
-              Text(locationName, maxLines: 1, overflow: TextOverflow.ellipsis),
-
-              Text(postName, maxLines: 1, overflow: TextOverflow.ellipsis),
               Text(
-                personnel.servicePostId,
+                personnel.serviceLocationName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                personnel.servicePostName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

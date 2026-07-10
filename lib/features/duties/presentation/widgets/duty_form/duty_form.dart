@@ -41,6 +41,8 @@ class _DutyFormState extends ConsumerState<DutyForm> {
       _location = widget.duty!.serviceLocationId;
       _post = widget.duty!.servicePostId;
       _notesController.text = widget.duty!.notes;
+    } else {
+      _date = DateTime.now();
     }
   }
 
@@ -56,6 +58,13 @@ class _DutyFormState extends ConsumerState<DutyForm> {
 
   @override
   Widget build(BuildContext context) {
+    final addState = ref.watch(addDutyProvider);
+    final editState = ref.watch(editDutyProvider);
+
+    final isLoading = widget.duty == null
+        ? addState.loading
+        : editState.loading;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -115,7 +124,7 @@ class _DutyFormState extends ConsumerState<DutyForm> {
           const SizedBox(height: 16),
 
           DutyActionsSection(
-            isLoading: false,
+            isLoading: isLoading,
 
             onSave: _save,
 
@@ -163,6 +172,7 @@ class _DutyFormState extends ConsumerState<DutyForm> {
   }
 
   Future<void> _save() async {
+    debugPrint('========== SAVE PRESSED ==========');
     if (_date == null) {
       _showMessage("يرجى اختيار تاريخ المناوبة");
       return;
@@ -198,6 +208,10 @@ class _DutyFormState extends ConsumerState<DutyForm> {
     final duty = DutyModel(
       id: widget.duty?.id ?? const Uuid().v4(),
       date: _date!,
+      dateKey:
+          "${_date!.year.toString().padLeft(4, '0')}-"
+          "${_date!.month.toString().padLeft(2, '0')}-"
+          "${_date!.day.toString().padLeft(2, '0')}",
       shiftId: _shift!,
       serviceLocationId: _location!,
       servicePostId: _post!,
@@ -221,18 +235,37 @@ class _DutyFormState extends ConsumerState<DutyForm> {
       await ref.read(editDutyProvider.notifier).updateDuty(duty, dutyPersonnel);
     }
 
-    final state = ref.read(addDutyProvider);
+    final addState = ref.read(addDutyProvider);
+    final editState = ref.read(editDutyProvider);
 
-    if (state.success) {
-      if (mounted) {
-        Navigator.pop(context);
+    debugPrint("ADD success = ${addState.success}");
+    debugPrint("ADD error = ${addState.error}");
+
+    debugPrint("EDIT success = ${editState.success}");
+    debugPrint("EDIT error = ${editState.error}");
+
+    if (widget.duty == null) {
+      final state = ref.read(addDutyProvider);
+
+      if (state.success) {
+        if (mounted) Navigator.pop(context);
+      } else if (state.error != null) {
+        _showMessage(state.error!);
       }
-    } else if (state.error != null) {
-      _showMessage(state.error!);
+    } else {
+      final state = ref.read(editDutyProvider);
+
+      if (state.success) {
+        if (mounted) Navigator.pop(context);
+      } else if (state.error != null) {
+        _showMessage(state.error!);
+      }
     }
   }
 
   void _showMessage(String message) {
+    debugPrint("SHOW MESSAGE: $message");
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );

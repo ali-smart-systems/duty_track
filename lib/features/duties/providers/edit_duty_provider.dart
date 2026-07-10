@@ -32,6 +32,22 @@ class EditDutyNotifier extends StateNotifier<EditDutyState> {
 
       final repository = _ref.read(dutyRepositoryProvider);
 
+      final dutyExists = await repository.dutyExists(
+        date: duty.date,
+        shiftId: duty.shiftId,
+        serviceLocationId: duty.serviceLocationId,
+        servicePostId: duty.servicePostId,
+        excludeDutyId: duty.id,
+      );
+
+      if (dutyExists) {
+        state = const EditDutyState(
+          error:
+              'توجد مناوبة مسجلة مسبقًا لنفس التاريخ والوردية والموقع ونقطة الخدمة',
+        );
+        return;
+      }
+
       await repository.updateDuty(duty);
 
       await repository.removeAllPersonnelFromDuty(duty.id);
