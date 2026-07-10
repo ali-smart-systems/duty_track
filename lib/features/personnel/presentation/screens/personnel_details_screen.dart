@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
 import '../../data/models/personnel_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../master_data/providers/master_data_provider.dart';
 
-class PersonnelDetailsScreen extends StatelessWidget {
+class PersonnelDetailsScreen extends ConsumerWidget {
   PersonnelDetailsScreen({super.key, required this.personnel})
     : _dateFormatter = intl.DateFormat('yyyy-MM-dd'),
       _dateTimeFormatter = intl.DateFormat('yyyy-MM-dd HH:mm');
@@ -15,7 +17,37 @@ class PersonnelDetailsScreen extends StatelessWidget {
   final intl.DateFormat _dateTimeFormatter;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locationsAsync = ref.watch(serviceLocationsProvider);
+
+    final postsAsync = ref.watch(
+      servicePostsProvider(personnel.serviceLocationId),
+    );
+
+    final locationName = locationsAsync.when(
+      data: (items) {
+        final location = items.where(
+          (e) => e.id == personnel.serviceLocationId,
+        );
+
+        return location.isEmpty
+            ? personnel.serviceLocationId
+            : location.first.name;
+      },
+      loading: () => '...',
+      error: (_, _) => personnel.serviceLocationId,
+    );
+
+    final postName = postsAsync.when(
+      data: (items) {
+        final post = items.where((e) => e.id == personnel.servicePostId);
+
+        return post.isEmpty ? personnel.servicePostId : post.first.name;
+      },
+      loading: () => '...',
+      error: (_, _) => personnel.servicePostId,
+    );
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -42,10 +74,8 @@ class PersonnelDetailsScreen extends StatelessWidget {
                       ),
                       _DetailTile(label: 'الرتبة', value: personnel.rank),
                       _DetailTile(label: 'القسم', value: personnel.department),
-                      _DetailTile(
-                        label: 'المسمى الوظيفي',
-                        value: personnel.jobTitle,
-                      ),
+                      _DetailTile(label: 'موقع الخدمة', value: locationName),
+                      _DetailTile(label: 'نقطة الخدمة', value: postName),
                       _DetailTile(label: 'الحالة', value: personnel.status),
                     ],
                   ),

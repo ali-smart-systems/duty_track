@@ -5,6 +5,8 @@ class DutyPersonnelModel {
     required this.id,
     required this.dutyId,
     required this.personnelId,
+    required this.role,
+    required this.isLeader,
     required this.createdAt,
   });
 
@@ -13,8 +15,14 @@ class DutyPersonnelModel {
   /// المناوبة
   final String dutyId;
 
-  /// الموظف
+  /// الفرد
   final String personnelId;
+
+  /// الدور داخل المناوبة
+  final String role;
+
+  /// هل هو قائد المناوبة
+  final bool isLeader;
 
   final DateTime createdAt;
 
@@ -22,12 +30,16 @@ class DutyPersonnelModel {
     String? id,
     String? dutyId,
     String? personnelId,
+    String? role,
+    bool? isLeader,
     DateTime? createdAt,
   }) {
     return DutyPersonnelModel(
       id: id ?? this.id,
       dutyId: dutyId ?? this.dutyId,
       personnelId: personnelId ?? this.personnelId,
+      role: role ?? this.role,
+      isLeader: isLeader ?? this.isLeader,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -37,6 +49,8 @@ class DutyPersonnelModel {
       id: map['id'] ?? '',
       dutyId: map['dutyId'] ?? '',
       personnelId: map['personnelId'] ?? '',
+      role: map['role'] ?? 'فرد',
+      isLeader: map['isLeader'] ?? false,
       createdAt: _dateTimeFromValue(map['createdAt']) ?? DateTime.now(),
     );
   }
@@ -54,6 +68,8 @@ class DutyPersonnelModel {
       'id': id,
       'dutyId': dutyId,
       'personnelId': personnelId,
+      'role': role,
+      'isLeader': isLeader,
       'createdAt': Timestamp.fromDate(createdAt),
     };
   }

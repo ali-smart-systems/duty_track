@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/master_data_provider.dart';
 import 'add_service_location_screen.dart';
-import 'service_posts_screen.dart';
+
+import '../widgets/master_data_list_tile.dart';
 
 class ServiceLocationsScreen extends ConsumerWidget {
   const ServiceLocationsScreen({super.key});
@@ -51,54 +52,60 @@ class ServiceLocationsScreen extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final location = locations[index];
 
-                return Card(
-                  elevation: 2,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      child: Text('${location.displayOrder}'),
-                    ),
+                return MasterDataListTile(
+                  title: location.name,
+                  subtitle: 'ترتيب: ${location.displayOrder}',
+                  icon: Icons.location_on,
 
-                    title: Text(location.name),
+                  onEdit: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            AddServiceLocationScreen(location: location),
+                      ),
+                    );
+                  },
 
-                    subtitle: Text(location.isActive ? 'نشط' : 'غير نشط'),
-
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => ServicePostsScreen(
-                            locationId: location.id,
-                            locationName: location.name,
+                  onDelete: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text('حذف موقع الخدمة'),
+                        content: Text('هل تريد حذف "${location.name}"؟'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('إلغاء'),
                           ),
-                        ),
-                      );
-                    },
+                          FilledButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('حذف'),
+                          ),
+                        ],
+                      ),
+                    );
 
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          tooltip: 'تعديل',
-                          icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => AddServiceLocationScreen(
-                                  location: location,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        IconButton(
-                          tooltip: 'حذف',
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () async {
-                            // كود الحذف الموجود لديك
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                    if (confirm == true) {
+                      try {
+                        await ref
+                            .read(masterDataRepositoryProvider)
+                            .deleteServiceLocation(location.id);
+
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('تم حذف الموقع')),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(e.toString())));
+                        }
+                      }
+                    }
+                  },
                 );
               },
             );

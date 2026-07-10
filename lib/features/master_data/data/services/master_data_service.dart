@@ -23,6 +23,9 @@ class MasterDataService {
 
   CollectionReference<Map<String, dynamic>> get _shifts =>
       _firestore.collection(AppConstants.shiftsCollection);
+
+  CollectionReference<Map<String, dynamic>> get _duties =>
+      _firestore.collection(AppConstants.dutiesCollection);
   // ==========================
   // Service Locations
   // ==========================
@@ -45,7 +48,20 @@ class MasterDataService {
     await _locations.doc(location.id).update(location.toFirestore());
   }
 
+  Future<bool> isShiftUsed(String shiftId) async {
+    final snapshot = await _duties
+        .where('shiftId', isEqualTo: shiftId)
+        .limit(1)
+        .get();
+
+    return snapshot.docs.isNotEmpty;
+  }
+
   Future<void> deleteServiceLocation(String id) async {
+    if (await isServiceLocationUsed(id)) {
+      throw Exception('لا يمكن حذف موقع الخدمة لأنه مستخدم في المناوبات.');
+    }
+
     await _locations.doc(id).delete();
   }
 
@@ -72,7 +88,29 @@ class MasterDataService {
     await _posts.doc(post.id).update(post.toFirestore());
   }
 
+  Future<bool> isServicePostUsed(String postId) async {
+    final snapshot = await _duties
+        .where('servicePostId', isEqualTo: postId)
+        .limit(1)
+        .get();
+
+    return snapshot.docs.isNotEmpty;
+  }
+
+  Future<bool> isServiceLocationUsed(String locationId) async {
+    final snapshot = await _duties
+        .where('serviceLocationId', isEqualTo: locationId)
+        .limit(1)
+        .get();
+
+    return snapshot.docs.isNotEmpty;
+  }
+
   Future<void> deleteServicePost(String id) async {
+    if (await isServicePostUsed(id)) {
+      throw Exception('لا يمكن حذف نقطة الخدمة لأنها مستخدمة في المناوبات.');
+    }
+
     await _posts.doc(id).delete();
   }
   // ==========================
@@ -97,6 +135,10 @@ class MasterDataService {
   }
 
   Future<void> deleteShift(String id) async {
+    if (await isShiftUsed(id)) {
+      throw Exception('لا يمكن حذف هذه الوردية لأنها مستخدمة في المناوبات.');
+    }
+
     await _shifts.doc(id).delete();
   }
   // ==========================

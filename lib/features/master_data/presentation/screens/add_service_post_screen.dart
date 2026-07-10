@@ -78,7 +78,9 @@ class _AddServicePostScreenState extends ConsumerState<AddServicePostScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يوجد منصب بنفس الاسم داخل هذا الموقع')),
+        const SnackBar(
+          content: Text('يوجد نقطة الخدمة بنفس الاسم داخل هذا الموقع'),
+        ),
       );
 
       return;
@@ -109,8 +111,8 @@ class _AddServicePostScreenState extends ConsumerState<AddServicePostScreen> {
         SnackBar(
           content: Text(
             widget.post == null
-                ? 'تمت إضافة المنصب بنجاح'
-                : 'تم تحديث المنصب بنجاح',
+                ? 'تمت إضافة نقطة الخدمة بنجاح'
+                : 'تم تحديث نقطة الخدمة بنجاح',
           ),
         ),
       );
@@ -131,7 +133,9 @@ class _AddServicePostScreenState extends ConsumerState<AddServicePostScreen> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.post == null ? 'إضافة منصب' : 'تعديل منصب'),
+          title: Text(
+            widget.post == null ? 'إضافة نقطة الخدمة' : 'تعديل نقطة الخدمة',
+          ),
         ),
         body: Form(
           key: _formKey,
@@ -141,12 +145,12 @@ class _AddServicePostScreenState extends ConsumerState<AddServicePostScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  labelText: 'اسم المنصب',
+                  labelText: 'اسم نقطة الخدمة',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'أدخل اسم المنصب';
+                    return 'أدخل اسم نقطة الخدمة';
                   }
                   return null;
                 },
@@ -190,7 +194,7 @@ class _AddServicePostScreenState extends ConsumerState<AddServicePostScreen> {
 
               SwitchListTile(
                 value: _isRequired,
-                title: const Text('منصب إلزامي'),
+                title: const Text('نقطة الخدمة إلزامي'),
                 onChanged: (value) {
                   setState(() {
                     _isRequired = value;

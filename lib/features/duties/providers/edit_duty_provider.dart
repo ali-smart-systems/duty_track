@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/duty_model.dart';
 import 'duty_list_provider.dart';
 import 'duty_repository_provider.dart';
+import '../data/models/duty_personnel_model.dart';
 
 final editDutyProvider =
     StateNotifierProvider.autoDispose<EditDutyNotifier, EditDutyState>((ref) {
@@ -22,11 +23,22 @@ class EditDutyNotifier extends StateNotifier<EditDutyState> {
 
   final Ref _ref;
 
-  Future<void> updateDuty(DutyModel duty) async {
+  Future<void> updateDuty(
+    DutyModel duty,
+    List<DutyPersonnelModel> personnel,
+  ) async {
     try {
       state = const EditDutyState(loading: true);
 
-      await _ref.read(dutyRepositoryProvider).updateDuty(duty);
+      final repository = _ref.read(dutyRepositoryProvider);
+
+      await repository.updateDuty(duty);
+
+      await repository.removeAllPersonnelFromDuty(duty.id);
+
+      for (final item in personnel) {
+        await repository.addPersonnelToDuty(item.copyWith(dutyId: duty.id));
+      }
 
       _ref
         ..invalidate(dutyListProvider)

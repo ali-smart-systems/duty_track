@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../duties/presentation/screens/duties_screen.dart';
 import '../../../personnel/presentation/screens/personnel_screen.dart';
 import '../widgets/app_drawer.dart';
 import 'dashboard_home_screen.dart';
@@ -17,7 +18,7 @@ class _DashboardShellState extends State<DashboardShell> {
   final List<Widget> pages = const [
     DashboardHomeScreen(),
     PersonnelScreen(),
-    Center(child: Text('المهام')),
+    DutiesScreen(),
     Center(child: Text('التقارير')),
   ];
 
@@ -49,9 +50,9 @@ class _DashboardShellState extends State<DashboardShell> {
             label: 'القوة',
           ),
           NavigationDestination(
-            icon: Icon(Icons.assignment_outlined),
-            selectedIcon: Icon(Icons.assignment),
-            label: 'المهام',
+            icon: Icon(Icons.event_note_outlined),
+            selectedIcon: Icon(Icons.event_note),
+            label: 'المناوبات',
           ),
           NavigationDestination(
             icon: Icon(Icons.bar_chart_outlined),

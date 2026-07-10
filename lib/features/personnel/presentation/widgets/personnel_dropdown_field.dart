@@ -13,7 +13,9 @@ class PersonnelDropdownField extends StatelessWidget {
 
   final String label;
   final String? value;
-  final List<String> items;
+
+  final List<DropdownMenuItem<String>> items;
+
   final ValueChanged<String?> onChanged;
   final IconData? icon;
   final String? Function(String?)? validator;
@@ -22,11 +24,7 @@ class PersonnelDropdownField extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
       initialValue: value == null || value!.isEmpty ? null : value,
-      items: items
-          .map(
-            (item) => DropdownMenuItem<String>(value: item, child: Text(item)),
-          )
-          .toList(),
+      items: items,
       onChanged: onChanged,
       validator: validator,
       decoration: InputDecoration(

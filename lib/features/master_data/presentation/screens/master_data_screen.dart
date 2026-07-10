@@ -30,7 +30,7 @@ class MasterDataScreen extends StatelessWidget {
             _buildItem(
               context,
               icon: Icons.badge,
-              title: 'المناصب',
+              title: 'نقاط الخدمة',
               page: const ServicePostsLocationsScreen(),
             ),
             _buildItem(

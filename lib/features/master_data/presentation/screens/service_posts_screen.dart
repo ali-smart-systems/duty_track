@@ -23,8 +23,8 @@ class ServicePostsScreen extends ConsumerWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('حذف المنصب'),
-          content: const Text('هل أنت متأكد من حذف هذا المنصب؟'),
+          title: const Text('حذف نقطة الخدمة'),
+          content: const Text('هل أنت متأكد من حذف نقطة الخدمة'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -48,7 +48,7 @@ class ServicePostsScreen extends ConsumerWidget {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('تم حذف المنصب بنجاح')));
+      ).showSnackBar(const SnackBar(content: Text('تم حذف نقطة الخدمة بنجاح')));
     } catch (e) {
       if (!context.mounted) return;
 
@@ -78,7 +78,7 @@ class ServicePostsScreen extends ConsumerWidget {
             );
           },
           icon: const Icon(Icons.add),
-          label: const Text('إضافة منصب'),
+          label: const Text('إضافة نقطة الخدمة'),
         ),
         body: postsAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -86,7 +86,10 @@ class ServicePostsScreen extends ConsumerWidget {
           data: (posts) {
             if (posts.isEmpty) {
               return const Center(
-                child: Text('لا توجد مناصب', style: TextStyle(fontSize: 18)),
+                child: Text(
+                  'لا توجد نقطة خدمة',
+                  style: TextStyle(fontSize: 18),
+                ),
               );
             }
 

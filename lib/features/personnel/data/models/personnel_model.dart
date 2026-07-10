@@ -7,7 +7,9 @@ class PersonnelModel {
     required this.fullName,
     required this.rank,
     required this.department,
-    required this.jobTitle,
+    required this.serviceLocationId,
+    required this.servicePostId,
+
     required this.phone,
     required this.email,
     required this.nationalId,
@@ -24,7 +26,9 @@ class PersonnelModel {
   final String fullName;
   final String rank;
   final String department;
-  final String jobTitle;
+  final String serviceLocationId;
+  final String servicePostId;
+
   final String phone;
   final String email;
   final String nationalId;
@@ -41,7 +45,9 @@ class PersonnelModel {
     String? fullName,
     String? rank,
     String? department,
-    String? jobTitle,
+    String? serviceLocationId,
+    String? servicePostId,
+
     String? phone,
     String? email,
     String? nationalId,
@@ -58,7 +64,9 @@ class PersonnelModel {
       fullName: fullName ?? this.fullName,
       rank: rank ?? this.rank,
       department: department ?? this.department,
-      jobTitle: jobTitle ?? this.jobTitle,
+      serviceLocationId: serviceLocationId ?? this.serviceLocationId,
+      servicePostId: servicePostId ?? this.servicePostId,
+
       phone: phone ?? this.phone,
       email: email ?? this.email,
       nationalId: nationalId ?? this.nationalId,
@@ -78,7 +86,9 @@ class PersonnelModel {
       fullName: map['fullName'] as String? ?? '',
       rank: map['rank'] as String? ?? '',
       department: map['department'] as String? ?? '',
-      jobTitle: map['jobTitle'] as String? ?? '',
+      serviceLocationId: map['serviceLocationId'] as String? ?? '',
+      servicePostId: map['servicePostId'] as String? ?? '',
+
       phone: map['phone'] as String? ?? '',
       email: map['email'] as String? ?? '',
       nationalId: map['nationalId'] as String? ?? '',
@@ -106,7 +116,9 @@ class PersonnelModel {
       'fullName': fullName,
       'rank': rank,
       'department': department,
-      'jobTitle': jobTitle,
+      'serviceLocationId': serviceLocationId,
+      'servicePostId': servicePostId,
+
       'phone': phone,
       'email': email,
       'nationalId': nationalId,

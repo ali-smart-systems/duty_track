@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/master_data_provider.dart';
 import 'add_shift_screen.dart';
+import '../widgets/master_data_list_tile.dart';
 
 class ShiftsScreen extends ConsumerWidget {
   const ShiftsScreen({super.key});
@@ -44,31 +45,59 @@ class ShiftsScreen extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final shift = shifts[index];
 
-                return Card(
-                  elevation: 2,
-                  child: ListTile(
-                    leading: const CircleAvatar(child: Icon(Icons.schedule)),
+                return MasterDataListTile(
+                  title: shift.name,
+                  subtitle: '${shift.startTime}  ←→  ${shift.endTime}',
+                  icon: Icons.schedule,
 
-                    title: Text(shift.name),
+                  onEdit: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AddShiftScreen(shift: shift),
+                      ),
+                    );
+                  },
 
-                    subtitle: Text('${shift.startTime}  ←→  ${shift.endTime}'),
+                  onDelete: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text('حذف الوردية'),
+                        content: Text('هل تريد حذف "${shift.name}"؟'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('إلغاء'),
+                          ),
+                          FilledButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('حذف'),
+                          ),
+                        ],
+                      ),
+                    );
 
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (value) {
-                        switch (value) {
-                          case 'edit':
-                            break;
+                    if (confirm == true) {
+                      try {
+                        await ref
+                            .read(masterDataRepositoryProvider)
+                            .deleteShift(shift.id);
 
-                          case 'delete':
-                            break;
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('تم حذف الوردية')),
+                          );
                         }
-                      },
-                      itemBuilder: (context) => const [
-                        PopupMenuItem(value: 'edit', child: Text('تعديل')),
-                        PopupMenuItem(value: 'delete', child: Text('حذف')),
-                      ],
-                    ),
-                  ),
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(e.toString())));
+                        }
+                      }
+                    }
+                  },
                 );
               },
             );

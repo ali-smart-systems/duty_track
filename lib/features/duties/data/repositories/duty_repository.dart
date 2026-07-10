@@ -1,11 +1,15 @@
 import '../models/duty_model.dart';
 import '../models/duty_personnel_model.dart';
 import '../services/duty_service.dart';
+import '../../../master_data/data/repositories/master_data_repository.dart';
+import '../models/duty_view_model.dart';
 
 class DutyRepository {
   DutyRepository({DutyService? service}) : _service = service ?? DutyService();
 
   final DutyService _service;
+
+  final MasterDataRepository _masterDataRepository = MasterDataRepository();
 
   // ==========================
   // Duties
@@ -49,5 +53,27 @@ class DutyRepository {
 
   Future<void> removeAllPersonnelFromDuty(String dutyId) {
     return _service.removeAllPersonnelFromDuty(dutyId);
+  }
+
+  Future<List<DutyViewModel>> getDutyViewModels() async {
+    final duties = await getDuties();
+
+    final shifts = await _masterDataRepository.getShifts().first;
+    final locations = await _masterDataRepository.getServiceLocations().first;
+
+    return duties.map((duty) {
+      final shift = shifts.where((e) => e.id == duty.shiftId).firstOrNull;
+
+      final location = locations
+          .where((e) => e.id == duty.serviceLocationId)
+          .firstOrNull;
+
+      return DutyViewModel(
+        duty: duty,
+        shiftName: shift?.name ?? '',
+        locationName: location?.name ?? '',
+        postName: '',
+      );
+    }).toList();
   }
 }

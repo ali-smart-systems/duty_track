@@ -4,8 +4,10 @@ import '../../data/models/personnel_model.dart';
 import 'personnel_date_field.dart';
 import 'personnel_dropdown_field.dart';
 import 'personnel_text_field.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../master_data/providers/master_data_provider.dart';
 
-class PersonnelForm extends StatefulWidget {
+class PersonnelForm extends ConsumerStatefulWidget {
   const PersonnelForm({
     super.key,
     required this.onSubmit,
@@ -18,33 +20,11 @@ class PersonnelForm extends StatefulWidget {
   final ValueChanged<PersonnelModel> onSubmit;
   final ValueChanged<PersonnelModel> onChanged;
   final bool isSubmitting;
-
   @override
-  State<PersonnelForm> createState() => _PersonnelFormState();
+  ConsumerState<PersonnelForm> createState() => _PersonnelFormState();
 }
 
-class _PersonnelFormState extends State<PersonnelForm> {
-  static const List<String> _rankOptions = [
-    'جندي',
-    'عريف',
-    'رقيب',
-    'مساعد',
-    'ملازم',
-    'نقيب',
-    'رائد',
-    'مقدم',
-    'عقيد',
-  ];
-
-  static const List<String> _departmentOptions = [
-    'الإدارة',
-    'الموارد البشرية',
-    'الأمن',
-    'العمليات',
-    'التدريب',
-    'الشؤون المالية',
-  ];
-
+class _PersonnelFormState extends ConsumerState<PersonnelForm> {
   static const List<String> _statusOptions = [
     'نشط',
     'إجازة',
@@ -56,7 +36,7 @@ class _PersonnelFormState extends State<PersonnelForm> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _militaryNumberController;
   late final TextEditingController _fullNameController;
-  late final TextEditingController _jobTitleController;
+
   late final TextEditingController _phoneController;
   late final TextEditingController _emailController;
   late final TextEditingController _nationalIdController;
@@ -64,7 +44,10 @@ class _PersonnelFormState extends State<PersonnelForm> {
 
   String? _rank;
   String? _department;
+  String? _serviceLocation;
+  String? _servicePost;
   String? _status;
+
   DateTime? _birthDate;
   DateTime? _hireDate;
 
@@ -79,9 +62,7 @@ class _PersonnelFormState extends State<PersonnelForm> {
     _fullNameController = TextEditingController(
       text: personnel?.fullName ?? '',
     );
-    _jobTitleController = TextEditingController(
-      text: personnel?.jobTitle ?? '',
-    );
+
     _phoneController = TextEditingController(text: personnel?.phone ?? '');
     _emailController = TextEditingController(text: personnel?.email ?? '');
     _nationalIdController = TextEditingController(
@@ -99,7 +80,7 @@ class _PersonnelFormState extends State<PersonnelForm> {
   void dispose() {
     _militaryNumberController.dispose();
     _fullNameController.dispose();
-    _jobTitleController.dispose();
+
     _phoneController.dispose();
     _emailController.dispose();
     _nationalIdController.dispose();
@@ -115,6 +96,12 @@ class _PersonnelFormState extends State<PersonnelForm> {
         key: _formKey,
         child: LayoutBuilder(
           builder: (context, constraints) {
+            final ranksAsync = ref.watch(ranksProvider);
+            final departmentsAsync = ref.watch(departmentsProvider);
+            final serviceLocationsAsync = ref.watch(serviceLocationsProvider);
+            final servicePostsAsync = _serviceLocation == null
+                ? const AsyncValue<List>.loading()
+                : ref.watch(servicePostsProvider(_serviceLocation!));
             final isWide = constraints.maxWidth >= 720;
             final spacing = isWide ? 16.0 : 12.0;
             final fieldWidth = isWide
@@ -149,43 +136,128 @@ class _PersonnelFormState extends State<PersonnelForm> {
                 ),
                 _fieldBox(
                   width: fieldWidth,
-                  child: PersonnelDropdownField(
-                    label: 'الرتبة',
-                    value: _rank,
-                    items: _rankOptions,
-                    icon: Icons.military_tech_outlined,
-                    validator: _requiredValidator,
-                    onChanged: (value) {
-                      setState(() => _rank = value);
-                      _emitChanged();
+                  child: ranksAsync.when(
+                    loading: () => const CircularProgressIndicator(),
+
+                    error: (error, stack) => const Text('خطأ في تحميل الرتب'),
+
+                    data: (ranks) {
+                      return PersonnelDropdownField(
+                        label: 'الرتبة',
+                        value: _rank,
+                        items: ranks
+                            .map(
+                              (rank) => DropdownMenuItem<String>(
+                                value: rank.id,
+                                child: Text(rank.name),
+                              ),
+                            )
+                            .toList(),
+                        icon: Icons.military_tech_outlined,
+                        validator: _requiredValidator,
+                        onChanged: (value) {
+                          setState(() => _rank = value);
+                          _emitChanged();
+                        },
+                      );
                     },
                   ),
                 ),
                 _fieldBox(
                   width: fieldWidth,
-                  child: PersonnelDropdownField(
-                    label: 'القسم',
-                    value: _department,
-                    items: _departmentOptions,
-                    icon: Icons.apartment_outlined,
-                    validator: _requiredValidator,
-                    onChanged: (value) {
-                      setState(() => _department = value);
-                      _emitChanged();
+                  child: departmentsAsync.when(
+                    loading: () => const CircularProgressIndicator(),
+
+                    error: (error, stack) => const Text('خطأ في تحميل الأقسام'),
+
+                    data: (departments) {
+                      return PersonnelDropdownField(
+                        label: 'القسم',
+                        value: _department,
+                        items: departments
+                            .map(
+                              (department) => DropdownMenuItem<String>(
+                                value: department.id,
+                                child: Text(department.name),
+                              ),
+                            )
+                            .toList(),
+                        icon: Icons.apartment_outlined,
+                        validator: _requiredValidator,
+                        onChanged: (value) {
+                          setState(() => _department = value);
+                          _emitChanged();
+                        },
+                      );
                     },
                   ),
                 ),
                 _fieldBox(
                   width: fieldWidth,
-                  child: PersonnelTextField(
-                    controller: _jobTitleController,
-                    label: 'المسمى الوظيفي',
-                    icon: Icons.work_outline,
-                    textInputAction: TextInputAction.next,
-                    validator: _requiredValidator,
-                    onChanged: (_) => _emitChanged(),
+                  child: serviceLocationsAsync.when(
+                    loading: () => const CircularProgressIndicator(),
+
+                    error: (error, stack) =>
+                        const Text('خطأ في تحميل مواقع الخدمة'),
+
+                    data: (locations) {
+                      return PersonnelDropdownField(
+                        label: 'موقع الخدمة',
+                        value: _serviceLocation,
+                        items: locations
+                            .map(
+                              (location) => DropdownMenuItem<String>(
+                                value: location.id,
+                                child: Text(location.name),
+                              ),
+                            )
+                            .toList(),
+                        icon: Icons.location_on_outlined,
+                        validator: _requiredValidator,
+                        onChanged: (value) {
+                          setState(() {
+                            _serviceLocation = value;
+                            _servicePost = null;
+                          });
+
+                          _emitChanged();
+                        },
+                      );
+                    },
                   ),
                 ),
+
+                _fieldBox(
+                  width: fieldWidth,
+                  child: servicePostsAsync.when(
+                    loading: () => const CircularProgressIndicator(),
+
+                    error: (error, stack) =>
+                        const Text('خطأ في تحميل نقاط الخدمة'),
+
+                    data: (posts) {
+                      return PersonnelDropdownField(
+                        label: 'نقطة الخدمة',
+                        value: _servicePost,
+                        items: posts
+                            .map(
+                              (post) => DropdownMenuItem<String>(
+                                value: post.id,
+                                child: Text(post.name),
+                              ),
+                            )
+                            .toList(),
+                        icon: Icons.location_city_outlined,
+                        validator: _requiredValidator,
+                        onChanged: (value) {
+                          setState(() => _servicePost = value);
+                          _emitChanged();
+                        },
+                      );
+                    },
+                  ),
+                ),
+
                 _fieldBox(
                   width: fieldWidth,
                   child: PersonnelTextField(
@@ -253,7 +325,14 @@ class _PersonnelFormState extends State<PersonnelForm> {
                   child: PersonnelDropdownField(
                     label: 'الحالة',
                     value: _status,
-                    items: _statusOptions,
+                    items: _statusOptions
+                        .map(
+                          (status) => DropdownMenuItem<String>(
+                            value: status,
+                            child: Text(status),
+                          ),
+                        )
+                        .toList(),
                     icon: Icons.verified_outlined,
                     validator: _requiredValidator,
                     onChanged: (value) {
@@ -321,7 +400,9 @@ class _PersonnelFormState extends State<PersonnelForm> {
       fullName: _fullNameController.text.trim(),
       rank: _rank ?? '',
       department: _department ?? '',
-      jobTitle: _jobTitleController.text.trim(),
+      serviceLocationId: _serviceLocation ?? '',
+      servicePostId: _servicePost ?? '',
+
       phone: _phoneController.text.trim(),
       email: _emailController.text.trim(),
       nationalId: _nationalIdController.text.trim(),

@@ -21,9 +21,9 @@ class _DutyPersonnelSelectorDialogState
     extends ConsumerState<DutyPersonnelSelectorDialog> {
   final TextEditingController _searchController = TextEditingController();
 
-  String _role = 'فرد';
+  final String _role = 'فرد';
 
-  bool _isLeader = false;
+  final bool _isLeader = false;
 
   String? _selectedPersonnelId;
 

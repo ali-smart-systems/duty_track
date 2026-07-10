@@ -6,6 +6,7 @@ import '../../providers/personnel_provider.dart';
 import 'add_personnel_screen.dart';
 import 'edit_personnel_screen.dart';
 import 'personnel_details_screen.dart';
+import '../../../master_data/providers/master_data_provider.dart';
 
 class PersonnelScreen extends ConsumerStatefulWidget {
   const PersonnelScreen({super.key});
@@ -449,7 +450,7 @@ class _FilterDropdown extends StatelessWidget {
   }
 }
 
-class _PersonnelCard extends StatelessWidget {
+class _PersonnelCard extends ConsumerWidget {
   const _PersonnelCard({
     required this.personnel,
     required this.isDeleting,
@@ -462,7 +463,37 @@ class _PersonnelCard extends StatelessWidget {
   onActionSelected;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locationsAsync = ref.watch(serviceLocationsProvider);
+
+    final postsAsync = ref.watch(
+      servicePostsProvider(personnel.serviceLocationId),
+    );
+
+    final locationName = locationsAsync.when(
+      data: (items) {
+        final location = items.where(
+          (e) => e.id == personnel.serviceLocationId,
+        );
+
+        return location.isEmpty
+            ? personnel.serviceLocationId
+            : location.first.name;
+      },
+      loading: () => '...',
+      error: (_, _) => personnel.serviceLocationId,
+    );
+
+    final postName = postsAsync.when(
+      data: (items) {
+        final post = items.where((e) => e.id == personnel.servicePostId);
+
+        return post.isEmpty ? personnel.servicePostId : post.first.name;
+      },
+      loading: () => '...',
+      error: (_, _) => personnel.servicePostId,
+    );
+
     return Card(
       clipBehavior: Clip.antiAlias,
       child: ListTile(
@@ -487,8 +518,12 @@ class _PersonnelCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+
+              Text(locationName, maxLines: 1, overflow: TextOverflow.ellipsis),
+
+              Text(postName, maxLines: 1, overflow: TextOverflow.ellipsis),
               Text(
-                personnel.jobTitle,
+                personnel.servicePostId,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
