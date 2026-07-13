@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../duties/presentation/screens/duties_screen.dart';
 import '../../../personnel/presentation/screens/personnel_screen.dart';
+import '../../../reports/presentation/screens/reports_home_screen.dart';
 import '../widgets/app_drawer.dart';
 import 'dashboard_home_screen.dart';
 
@@ -19,7 +20,7 @@ class _DashboardShellState extends State<DashboardShell> {
     DashboardHomeScreen(),
     PersonnelScreen(),
     DutiesScreen(),
-    Center(child: Text('التقارير')),
+    ReportsHomeScreen(),
   ];
 
   @override

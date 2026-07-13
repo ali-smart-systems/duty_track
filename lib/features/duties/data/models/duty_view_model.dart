@@ -6,6 +6,8 @@ class DutyViewModel {
     required this.shiftName,
     required this.locationName,
     required this.postName,
+    required this.taskTypeName,
+    required this.status,
   });
 
   final DutyModel duty;
@@ -15,4 +17,10 @@ class DutyViewModel {
   final String locationName;
 
   final String postName;
+
+  /// اسم نوع المهمة
+  final String taskTypeName;
+
+  /// حالة المناوبة
+  final String status;
 }

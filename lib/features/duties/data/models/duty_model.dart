@@ -8,6 +8,10 @@ class DutyModel {
     required this.shiftId,
     required this.serviceLocationId,
     required this.servicePostId,
+
+    // جديد
+    required this.taskTypeId,
+    required this.status,
     required this.notes,
     required this.createdAt,
     required this.updatedAt,
@@ -29,6 +33,11 @@ class DutyModel {
   /// نقطة الخدمة
   final String servicePostId;
 
+  /// نوع المهمة
+  final String taskTypeId;
+
+  final String status;
+
   /// ملاحظات
   final String notes;
 
@@ -42,6 +51,10 @@ class DutyModel {
     String? shiftId,
     String? serviceLocationId,
     String? servicePostId,
+    String? status,
+    // جديد
+    String? taskTypeId,
+
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -53,6 +66,9 @@ class DutyModel {
       shiftId: shiftId ?? this.shiftId,
       serviceLocationId: serviceLocationId ?? this.serviceLocationId,
       servicePostId: servicePostId ?? this.servicePostId,
+      status: status ?? this.status,
+      taskTypeId: taskTypeId ?? this.taskTypeId,
+
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -67,6 +83,9 @@ class DutyModel {
       shiftId: map['shiftId'] ?? '',
       serviceLocationId: map['serviceLocationId'] ?? '',
       servicePostId: map['servicePostId'] ?? '',
+
+      taskTypeId: map['taskTypeId'] ?? '',
+      status: map['status'] ?? '',
       notes: map['notes'] ?? '',
       createdAt: _dateTimeFromValue(map['createdAt']) ?? DateTime.now(),
       updatedAt: _dateTimeFromValue(map['updatedAt']) ?? DateTime.now(),
@@ -89,6 +108,9 @@ class DutyModel {
       'shiftId': shiftId,
       'serviceLocationId': serviceLocationId,
       'servicePostId': servicePostId,
+
+      'taskTypeId': taskTypeId,
+      'status': status,
       'notes': notes,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),

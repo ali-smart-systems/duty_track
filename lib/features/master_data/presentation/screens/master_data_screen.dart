@@ -5,6 +5,8 @@ import 'service_posts_locations_screen.dart';
 import 'shifts_screen.dart';
 import 'ranks_screen.dart';
 import 'departments_screen.dart';
+import 'task_types_screen.dart';
+import 'leave_types_screen.dart';
 
 class MasterDataScreen extends StatelessWidget {
   const MasterDataScreen({super.key});
@@ -51,11 +53,18 @@ class MasterDataScreen extends StatelessWidget {
               title: 'الأقسام',
               page: const DepartmentsScreen(),
             ),
-            _buildComingSoon(
+            _buildItem(
+              context,
               icon: Icons.event_available,
               title: 'أنواع الإجازات',
+              page: const LeaveTypesScreen(),
             ),
-            _buildComingSoon(icon: Icons.assignment, title: 'أنواع المهام'),
+            _buildItem(
+              context,
+              icon: Icons.assignment,
+              title: 'أنواع المهام',
+              page: const TaskTypesScreen(),
+            ),
           ],
         ),
       ),
@@ -76,16 +85,6 @@ class MasterDataScreen extends StatelessWidget {
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => page));
         },
-      ),
-    );
-  }
-
-  Widget _buildComingSoon({required IconData icon, required String title}) {
-    return Card(
-      child: ListTile(
-        leading: Icon(icon),
-        title: Text(title),
-        trailing: const Chip(label: Text('قريبًا')),
       ),
     );
   }

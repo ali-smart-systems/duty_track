@@ -5,6 +5,8 @@ class AppConstants {
   // Application
   // =========================
 
+  static const String taskTypesCollection = 'task_types';
+
   static const String appName = 'DUTY TRACK';
 
   static const String appVersion = '1.0.0';

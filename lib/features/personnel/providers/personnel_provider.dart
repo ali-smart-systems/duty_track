@@ -73,19 +73,19 @@ final filteredPersonnelListProvider = FutureProvider<List<PersonnelModel>>((
 
   return filteredPersonnel;
 });
-
 final personnelFilterOptionsProvider = FutureProvider<PersonnelFilterOptions>((
   ref,
 ) async {
-  final personnel = await ref.watch(personnelListProvider.future);
+  final personnel = await ref.watch(personnelViewListProvider.future);
 
   return PersonnelFilterOptions(
-    ranks: _uniqueSortedValues(personnel.map((person) => person.rank)),
-
+    ranks: _uniqueSortedValues(personnel.map((person) => person.rankName)),
     departments: _uniqueSortedValues(
-      personnel.map((person) => person.department),
+      personnel.map((person) => person.departmentName),
     ),
-    statuses: _uniqueSortedValues(personnel.map((person) => person.status)),
+    statuses: _uniqueSortedValues(
+      personnel.map((person) => person.personnel.status),
+    ),
   );
 });
 

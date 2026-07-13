@@ -5,6 +5,7 @@ import '../../../master_data/data/repositories/master_data_repository.dart';
 import '../models/duty_view_model.dart';
 import '../../../personnel/data/repositories/personnel_repository.dart';
 import '../models/duty_personnel_view_model.dart';
+import '../../../master_data/data/repositories/task_type_repository.dart';
 
 class DutyRepository {
   DutyRepository({DutyService? service}) : _service = service ?? DutyService();
@@ -12,6 +13,8 @@ class DutyRepository {
   final DutyService _service;
 
   final MasterDataRepository _masterDataRepository = MasterDataRepository();
+
+  final TaskTypeRepository _taskTypeRepository = TaskTypeRepository();
 
   // ==========================
   // Duties
@@ -78,7 +81,7 @@ class DutyRepository {
 
     final shifts = await _masterDataRepository.getShifts().first;
     final locations = await _masterDataRepository.getServiceLocations().first;
-
+    final taskTypes = await _taskTypeRepository.getTaskTypes().first;
     final posts = <dynamic>[];
 
     for (final location in locations) {
@@ -95,12 +98,16 @@ class DutyRepository {
           .firstOrNull;
 
       final post = posts.where((e) => e.id == duty.servicePostId).firstOrNull;
-
+      final taskType = taskTypes
+          .where((e) => e.id == duty.taskTypeId)
+          .firstOrNull;
       return DutyViewModel(
         duty: duty,
         shiftName: shift?.name ?? '',
         locationName: location?.name ?? '',
         postName: post?.name ?? '',
+        taskTypeName: taskType?.name ?? '',
+        status: duty.status,
       );
     }).toList();
   }
@@ -111,17 +118,17 @@ class DutyRepository {
     final dutyPersonnel = await getDutyPersonnel(dutyId);
 
     final personnelRepository = PersonnelRepository();
-    final personnel = await personnelRepository.getPersonnel();
+    final personnel = await personnelRepository.getPersonnelViewModels();
 
     return dutyPersonnel.map((item) {
       final person = personnel
-          .where((e) => e.id == item.personnelId)
+          .where((e) => e.personnel.id == item.personnelId)
           .firstOrNull;
 
       return DutyPersonnelViewModel(
         personnelId: item.personnelId,
-        fullName: person?.fullName ?? '',
-        rank: person?.rank ?? '',
+        fullName: person?.personnel.fullName ?? '',
+        rank: person?.rankName ?? '',
         role: item.role,
         isLeader: item.isLeader,
       );
@@ -137,7 +144,7 @@ class DutyRepository {
 
     final shifts = await _masterDataRepository.getShifts().first;
     final locations = await _masterDataRepository.getServiceLocations().first;
-
+    final taskTypes = await _taskTypeRepository.getTaskTypes().first;
     final posts = <dynamic>[];
 
     for (final location in locations) {
@@ -153,12 +160,16 @@ class DutyRepository {
         .firstOrNull;
 
     final post = posts.where((e) => e.id == duty.servicePostId).firstOrNull;
-
+    final taskType = taskTypes
+        .where((e) => e.id == duty.taskTypeId)
+        .firstOrNull;
     return DutyViewModel(
       duty: duty,
       shiftName: shift?.name ?? '',
       locationName: location?.name ?? '',
       postName: post?.name ?? '',
+      taskTypeName: taskType?.name ?? '',
+      status: duty.status,
     );
   }
 }

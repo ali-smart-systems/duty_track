@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../master_data/providers/master_data_provider.dart';
+import '../../../../master_data/providers/task_type_provider.dart';
 
 class DutyInformationSection extends ConsumerWidget {
   const DutyInformationSection({
@@ -10,6 +11,8 @@ class DutyInformationSection extends ConsumerWidget {
     required this.selectedLocation,
     required this.selectedPost,
     required this.selectedStatus,
+    required this.selectedTaskType,
+    required this.onTaskTypeChanged,
     required this.locationId,
     required this.onDatePressed,
     required this.onShiftChanged,
@@ -24,6 +27,7 @@ class DutyInformationSection extends ConsumerWidget {
   final String? selectedLocation;
   final String? selectedPost;
   final String? selectedStatus;
+  final String? selectedTaskType;
 
   // أضف هذا السطر
   final String? locationId;
@@ -34,6 +38,8 @@ class DutyInformationSection extends ConsumerWidget {
   final ValueChanged<String?> onLocationChanged;
   final ValueChanged<String?> onPostChanged;
   final ValueChanged<String?> onStatusChanged;
+  final ValueChanged<String?> onTaskTypeChanged;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     debugPrint(
@@ -42,6 +48,8 @@ class DutyInformationSection extends ConsumerWidget {
     final shiftsAsync = ref.watch(shiftsProvider);
 
     final locationsAsync = ref.watch(serviceLocationsProvider);
+
+    final taskTypesAsync = ref.watch(taskTypesProvider);
 
     final postsAsync = selectedLocation == null
         ? const AsyncValue<List>.loading()
@@ -156,6 +164,34 @@ class DutyInformationSection extends ConsumerWidget {
                             )
                             .toList(),
                         onChanged: onPostChanged,
+                      );
+                    },
+                  ),
+                ),
+
+                SizedBox(
+                  width: 250,
+                  child: taskTypesAsync.when(
+                    loading: () => const CircularProgressIndicator(),
+
+                    error: (_, _) => const Text('خطأ في تحميل أنواع المهام'),
+
+                    data: (taskTypes) {
+                      return DropdownButtonFormField<String>(
+                        initialValue: selectedTaskType,
+                        decoration: const InputDecoration(
+                          labelText: "نوع المهمة",
+                          border: OutlineInputBorder(),
+                        ),
+                        items: taskTypes
+                            .map(
+                              (task) => DropdownMenuItem<String>(
+                                value: task.id,
+                                child: Text(task.name),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: onTaskTypeChanged,
                       );
                     },
                   ),

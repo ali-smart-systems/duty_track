@@ -59,7 +59,6 @@ class DutyDetailsScreen extends ConsumerWidget {
               ),
 
               const SizedBox(height: 12),
-
               Card(
                 child: ListTile(
                   leading: const Icon(Icons.security),
@@ -68,8 +67,27 @@ class DutyDetailsScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
 
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.assignment),
+                  title: const Text('نوع المهمة'),
+                  subtitle: Text(view.taskTypeName),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.info_outline),
+                  title: const Text('الحالة'),
+                  subtitle: Text(view.status),
+                ),
+              ),
+
+              const SizedBox(height: 20),
               const Text(
                 'أفراد المناوبة',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),

@@ -13,6 +13,7 @@ import '../../../data/models/duty_model.dart';
 import 'package:uuid/uuid.dart';
 import '../../../data/models/duty_personnel_model.dart';
 import '../../../providers/edit_duty_provider.dart';
+import '../../../../master_data/providers/task_type_provider.dart';
 
 class DutyForm extends ConsumerStatefulWidget {
   const DutyForm({super.key, this.duty});
@@ -31,6 +32,8 @@ class _DutyFormState extends ConsumerState<DutyForm> {
   String? _location;
   String? _post;
   String? _status;
+  String? _taskTypeId;
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +44,7 @@ class _DutyFormState extends ConsumerState<DutyForm> {
       _location = widget.duty!.serviceLocationId;
       _post = widget.duty!.servicePostId;
       _notesController.text = widget.duty!.notes;
+      _taskTypeId = widget.duty?.taskTypeId;
     } else {
       _date = DateTime.now();
     }
@@ -75,12 +79,19 @@ class _DutyFormState extends ConsumerState<DutyForm> {
             selectedLocation: _location,
             selectedPost: _post,
             selectedStatus: _status,
+            selectedTaskType: _taskTypeId,
             locationId: _location,
 
             onDatePressed: _pickDate,
 
             onShiftChanged: (value) {
               setState(() => _shift = value);
+            },
+
+            onTaskTypeChanged: (value) {
+              setState(() {
+                _taskTypeId = value;
+              });
             },
 
             onLocationChanged: (value) {
@@ -198,12 +209,21 @@ class _DutyFormState extends ConsumerState<DutyForm> {
       return;
     }
 
+    if (_taskTypeId == null) {
+      _showMessage("يرجى اختيار نوع المهمة");
+      return;
+    }
+
     if (_personnel.isEmpty) {
       _showMessage("يجب إضافة فرد واحد على الأقل");
       return;
     }
 
     final now = DateTime.now();
+
+    final taskTypes = ref.read(taskTypesProvider).value ?? [];
+
+    final selectedTask = taskTypes.firstWhere((e) => e.id == _taskTypeId);
 
     final duty = DutyModel(
       id: widget.duty?.id ?? const Uuid().v4(),
@@ -215,6 +235,9 @@ class _DutyFormState extends ConsumerState<DutyForm> {
       shiftId: _shift!,
       serviceLocationId: _location!,
       servicePostId: _post!,
+
+      taskTypeId: selectedTask.id,
+      status: _status!,
       notes: _notesController.text.trim(),
       createdAt: widget.duty?.createdAt ?? now,
       updatedAt: now,
