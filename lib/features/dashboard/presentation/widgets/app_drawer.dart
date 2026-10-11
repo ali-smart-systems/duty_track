@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../../features/master_data/presentation/screens/master_data_screen.dart';
 
@@ -72,9 +73,9 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('تسجيل الخروج'),
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context);
-              // TODO: تنفيذ تسجيل الخروج
+              await FirebaseAuth.instance.signOut();
             },
           ),
         ],
