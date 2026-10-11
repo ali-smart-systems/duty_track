@@ -26,6 +26,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   void _listenAuthState() {
     _subscription = _repository.authStateChanges().listen((user) async {
       if (user == null) {
+        if (!mounted) return;
         state = state.copyWith(
           isInitialized: true,
           clearUser: true,
@@ -34,13 +35,25 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return;
       }
 
-      final currentUser = await _repository.currentUserData();
-
-      state = state.copyWith(
-        isInitialized: true,
-        user: currentUser,
-        clearError: true,
-      );
+      try {
+        final currentUser = await _repository.currentUserData();
+        if (!mounted) return;
+        state = state.copyWith(
+          isInitialized: true,
+          user: currentUser != null && currentUser.isActive && !currentUser.isDeleted
+              ? currentUser
+              : null,
+          clearUser: currentUser == null || !currentUser.isActive || currentUser.isDeleted,
+          clearError: true,
+        );
+      } catch (error) {
+        if (!mounted) return;
+        state = state.copyWith(
+          isInitialized: true,
+          clearUser: true,
+          errorMessage: 'تعذر التحقق من صلاحية الحساب',
+        );
+      }
     });
   }
 
