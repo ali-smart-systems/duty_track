@@ -41,6 +41,18 @@ class AppRouter {
     ),
 
     GoRoute(
+      path: AppRoutes.personnel,
+      builder: (context, state) => const DashboardShell(initialIndex: 1),
+    ),
+    GoRoute(
+      path: AppRoutes.tasks,
+      builder: (context, state) => const DashboardShell(initialIndex: 2),
+    ),
+    GoRoute(
+      path: AppRoutes.reports,
+      builder: (context, state) => const DashboardShell(initialIndex: 3),
+    ),
+    GoRoute(
       path: AppRoutes.serviceLocations,
       builder: (context, state) => const ServiceLocationsScreen(),
     ),
