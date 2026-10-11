@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../app/app_routes.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
@@ -13,6 +14,16 @@ class AppRouter {
 
   static final router = GoRouter(
     initialLocation: AppRoutes.splash,
+    redirect: (context, state) {
+      final location = state.matchedLocation;
+      if (location == AppRoutes.splash || location == AppRoutes.login) {
+        return null;
+      }
+      if (FirebaseAuth.instance.currentUser == null) {
+        return AppRoutes.login;
+      }
+      return null;
+    },
     routes: routes,
   );
 
