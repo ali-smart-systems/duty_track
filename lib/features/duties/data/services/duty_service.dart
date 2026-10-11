@@ -81,16 +81,47 @@ class DutyService {
   }
 
   Future<void> deleteDuty(String id) async {
-    await _duties.doc(id).delete();
-
     final personnel = await _dutyPersonnel.where('dutyId', isEqualTo: id).get();
+    if (personnel.docs.length >= 499) {
+      throw StateError('عدد سجلات المناوبة يتجاوز الحد الآمن للحذف الدفعي');
+    }
 
     final batch = _firestore.batch();
 
     for (final doc in personnel.docs) {
       batch.delete(doc.reference);
     }
+    batch.delete(_duties.doc(id));
+    await batch.commit();
+  }
 
+  Future<void> replaceDutyWithPersonnel(
+    DutyModel duty,
+    List<DutyPersonnelModel> personnel,
+  ) async {
+    if (personnel.isEmpty) {
+      throw ArgumentError('يجب إسناد فرد واحد على الأقل');
+    }
+    final ids = personnel.map((item) => item.personnelId).toList();
+    if (ids.toSet().length != ids.length) {
+      throw ArgumentError('لا يجوز تكرار الفرد في نفس المناوبة');
+    }
+    if (personnel.where((item) => item.isLeader).length > 1) {
+      throw ArgumentError('لا يجوز إسناد أكثر من قائد للمناوبة');
+    }
+    final existing = await _dutyPersonnel.where('dutyId', isEqualTo: duty.id).get();
+    if (existing.docs.length + personnel.length + 1 > 499) {
+      throw StateError('عدد عمليات التحديث يتجاوز الحد الآمن للدفعة');
+    }
+    final batch = _firestore.batch();
+    batch.update(_duties.doc(duty.id), duty.toFirestore());
+    for (final doc in existing.docs) {
+      batch.delete(doc.reference);
+    }
+    for (final item in personnel) {
+      final ref = item.id.isEmpty ? _dutyPersonnel.doc() : _dutyPersonnel.doc(item.id);
+      batch.set(ref, item.copyWith(dutyId: duty.id).toFirestore());
+    }
     await batch.commit();
   }
 
