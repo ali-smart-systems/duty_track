@@ -95,10 +95,26 @@ class DutyService {
     await batch.commit();
   }
 
-  Future<void> replaceDutyWithPersonnel(
+  Future<String> createDutyWithPersonnel(
     DutyModel duty,
     List<DutyPersonnelModel> personnel,
   ) async {
+    _validateAssignments(personnel);
+    if (personnel.length + 1 > 499) {
+      throw StateError('عدد عمليات الإضافة يتجاوز الحد الآمن للدفعة');
+    }
+    final dutyRef = duty.id.isEmpty ? _duties.doc() : _duties.doc(duty.id);
+    final batch = _firestore.batch();
+    batch.set(dutyRef, duty.toFirestore());
+    for (final item in personnel) {
+      final ref = item.id.isEmpty ? _dutyPersonnel.doc() : _dutyPersonnel.doc(item.id);
+      batch.set(ref, item.copyWith(dutyId: dutyRef.id).toFirestore());
+    }
+    await batch.commit();
+    return dutyRef.id;
+  }
+
+  void _validateAssignments(List<DutyPersonnelModel> personnel) {
     if (personnel.isEmpty) {
       throw ArgumentError('يجب إسناد فرد واحد على الأقل');
     }
@@ -109,6 +125,13 @@ class DutyService {
     if (personnel.where((item) => item.isLeader).length > 1) {
       throw ArgumentError('لا يجوز إسناد أكثر من قائد للمناوبة');
     }
+  }
+
+  Future<void> replaceDutyWithPersonnel(
+    DutyModel duty,
+    List<DutyPersonnelModel> personnel,
+  ) async {
+    _validateAssignments(personnel);
     final existing = await _dutyPersonnel.where('dutyId', isEqualTo: duty.id).get();
     if (existing.docs.length + personnel.length + 1 > 499) {
       throw StateError('عدد عمليات التحديث يتجاوز الحد الآمن للدفعة');
