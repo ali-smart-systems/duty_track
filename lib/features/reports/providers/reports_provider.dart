@@ -152,16 +152,17 @@ class ReportsController extends StateNotifier<ReportsState> {
   final ReportsService _service;
 
   void setReportType(ReportType reportType) {
-    state = state.copyWith(reportType: reportType);
+    state = state.copyWith(reportType: reportType, result: const AsyncData(null));
   }
 
   void setFilter(ReportFilter filter) {
-    state = state.copyWith(filter: filter);
+    state = state.copyWith(filter: filter, result: const AsyncData(null));
   }
 
   void setDateRange(DateTime fromDate, DateTime toDate) {
     state = state.copyWith(
       filter: state.filter.copyWith(fromDate: fromDate, toDate: toDate),
+      result: const AsyncData(null),
     );
   }
 
@@ -171,10 +172,20 @@ class ReportsController extends StateNotifier<ReportsState> {
         fromDate: state.filter.fromDate,
         toDate: state.filter.toDate,
       ),
+      result: const AsyncData(null),
     );
   }
 
   Future<void> generateReport() async {
+    if (state.filter.fromDate.isAfter(state.filter.toDate)) {
+      state = state.copyWith(
+        result: AsyncError(
+          ArgumentError('تاريخ البداية يجب أن يسبق تاريخ النهاية'),
+          StackTrace.current,
+        ),
+      );
+      return;
+    }
     state = state.copyWith(result: const AsyncLoading());
 
     try {
