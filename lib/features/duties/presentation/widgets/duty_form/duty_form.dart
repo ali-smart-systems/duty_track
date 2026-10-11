@@ -21,7 +21,6 @@ class DutyForm extends ConsumerStatefulWidget {
   final DutyModel? duty;
 
   @override
-  @override
   ConsumerState<DutyForm> createState() => _DutyFormState();
 }
 
@@ -45,6 +44,7 @@ class _DutyFormState extends ConsumerState<DutyForm> {
       _post = widget.duty!.servicePostId;
       _notesController.text = widget.duty!.notes;
       _taskTypeId = widget.duty?.taskTypeId;
+      _status = widget.duty?.status;
     } else {
       _date = DateTime.now();
     }
@@ -223,6 +223,10 @@ class _DutyFormState extends ConsumerState<DutyForm> {
 
     final taskTypes = ref.read(taskTypesProvider).value ?? [];
 
+    if (!taskTypes.any((e) => e.id == _taskTypeId)) {
+      _showMessage('نوع المهمة المحدد غير متاح، يرجى اختيار نوع آخر');
+      return;
+    }
     final selectedTask = taskTypes.firstWhere((e) => e.id == _taskTypeId);
 
     final duty = DutyModel(
