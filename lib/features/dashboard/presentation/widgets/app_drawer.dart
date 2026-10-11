@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../app/app_routes.dart';
 import '../../../auth/providers/auth_provider.dart';
-
 import '../../../../features/master_data/presentation/screens/master_data_screen.dart';
 
 class AppDrawer extends ConsumerWidget {
@@ -11,48 +11,51 @@ class AppDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    void navigate(String route) {
+      Navigator.of(context).pop();
+      context.go(route);
+    }
+
     return Drawer(
       child: ListView(
         children: [
           const DrawerHeader(
             child: Center(
-              child: Text(
-                'DUTY TRACK',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+              child: Text('DUTY TRACK',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             ),
           ),
-
-          ListTile(leading: Icon(Icons.home), title: Text('الرئيسية')),
-
           ListTile(
-            leading: Icon(Icons.groups),
+            leading: const Icon(Icons.home),
+            title: const Text('الرئيسية'),
+            onTap: () => navigate(AppRoutes.dashboard),
+          ),
+          ListTile(
+            leading: const Icon(Icons.groups),
             title: const Text('القوة البشرية'),
-            onTap: () { Navigator.pop(context); context.go(AppRoutes.personnel); },
+            onTap: () => navigate(AppRoutes.personnel),
           ),
-
           ListTile(
-            leading: Icon(Icons.assignment),
-            title: const Text('المهام'),
-            onTap: () { Navigator.pop(context); context.go(AppRoutes.tasks); },
+            leading: const Icon(Icons.assignment),
+            title: const Text('المناوبات'),
+            onTap: () => navigate(AppRoutes.tasks),
           ),
-
-          ListTile(leading: Icon(Icons.event), title: Text('الإجازات')),
-
+          const ListTile(
+            leading: Icon(Icons.event),
+            title: Text('الإجازات (قيد التطوير)'),
+            enabled: false,
+          ),
           const ListTile(
             leading: Icon(Icons.school),
-            title: const Text('البرامج الثقافية'),
-            onTap: () { Navigator.pop(context); context.go(AppRoutes.culturalPrograms); },
+            title: Text('البرامج الثقافية (قيد التطوير)'),
+            enabled: false,
           ),
-
-          const ListTile(
-            leading: Icon(Icons.bar_chart),
+          ListTile(
+            leading: const Icon(Icons.bar_chart),
             title: const Text('التقارير'),
-            onTap: () { Navigator.pop(context); context.go(AppRoutes.reports); },
+            onTap: () => navigate(AppRoutes.reports),
           ),
-
           const Divider(),
-
           ExpansionTile(
             leading: const Icon(Icons.settings),
             title: const Text('الإعدادات'),
@@ -62,28 +65,22 @@ class AppDrawer extends ConsumerWidget {
                 title: const Text('البيانات الأساسية'),
                 onTap: () async {
                   Navigator.of(context).pop();
-
-                  await Future.delayed(Duration.zero);
-
+                  await Future<void>.delayed(Duration.zero);
                   if (!context.mounted) return;
-
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const MasterDataScreen()),
-                  );
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => const MasterDataScreen()));
                 },
               ),
             ],
           ),
-
           const Divider(),
-
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('تسجيل الخروج'),
             onTap: () async {
-              Navigator.pop(context);
+              Navigator.of(context).pop();
               await ref.read(authProvider.notifier).logout();
-      if (context.mounted) context.go(AppRoutes.login);
+              if (context.mounted) context.go(AppRoutes.login);
             },
           ),
         ],
