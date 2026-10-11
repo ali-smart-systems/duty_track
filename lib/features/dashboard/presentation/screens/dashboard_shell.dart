@@ -7,14 +7,30 @@ import '../widgets/app_drawer.dart';
 import 'dashboard_home_screen.dart';
 
 class DashboardShell extends StatefulWidget {
-  const DashboardShell({super.key});
+  const DashboardShell({super.key, this.initialIndex = 0});
+
+  final int initialIndex;
 
   @override
   State<DashboardShell> createState() => _DashboardShellState();
 }
 
 class _DashboardShellState extends State<DashboardShell> {
-  int currentIndex = 0;
+  late int currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    currentIndex = widget.initialIndex;
+  }
+
+  @override
+  void didUpdateWidget(covariant DashboardShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialIndex != widget.initialIndex) {
+      currentIndex = widget.initialIndex;
+    }
+  }
 
   final List<Widget> pages = const [
     DashboardHomeScreen(),
