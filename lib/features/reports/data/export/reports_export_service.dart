@@ -182,7 +182,7 @@ class ReportsExportService {
                   ),
                 ),
                 pw.Text(
-                  'إدارة الموارد البشرية - منشأة إصلاحية',
+                  'إدارة القوة البشرية - السجن المركزي بمحافظة ذمار',
                   style: const pw.TextStyle(
                     fontSize: 10,
                     color: PdfColors.blueGrey700,
@@ -345,7 +345,7 @@ class ReportsExportService {
             ? [
                 ['لا توجد بيانات', '0'],
               ]
-            : rows.take(8).map((entry) => [entry.key, entry.value]).toList(),
+            : rows.map((entry) => [entry.key, entry.value]).toList(),
       ),
     );
   }
@@ -365,7 +365,7 @@ class ReportsExportService {
             ? [
                 ['لا توجد بيانات', '', '', '', '', ''],
               ]
-            : result.duties.take(20).map((item) {
+            : result.duties.map((item) {
                 return [
                   DateFormat('yyyy-MM-dd').format(item.duty.date),
                   item.shiftName,
@@ -394,7 +394,7 @@ class ReportsExportService {
             ? [
                 ['لا توجد بيانات', '', '', '', ''],
               ]
-            : result.personnel.take(25).map((item) {
+            : result.personnel.map((item) {
                 return [
                   item.personnel.militaryNumber,
                   item.personnel.fullName,
