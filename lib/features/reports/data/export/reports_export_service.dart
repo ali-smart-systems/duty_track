@@ -18,6 +18,11 @@ class ReportsExportService {
     required ReportResult result,
     required String reportTitle,
   }) async {
+    final validationErrors = ReportSummaryValidator.validate(result.summary);
+    if (validationErrors.isNotEmpty) {
+      throw StateError('لا يمكن تصدير تقرير غير متسق: ${validationErrors.join('؛ ')}');
+    }
+
     final regularFont = await PdfGoogleFonts.notoNaskhArabicRegular();
     final boldFont = await PdfGoogleFonts.notoNaskhArabicBold();
     final document = pw.Document(
@@ -60,6 +65,11 @@ class ReportsExportService {
     required ReportResult result,
     required String reportTitle,
   }) async {
+    final validationErrors = ReportSummaryValidator.validate(result.summary);
+    if (validationErrors.isNotEmpty) {
+      throw StateError('لا يمكن تصدير تقرير غير متسق: ${validationErrors.join('؛ ')}');
+    }
+
     final workbook = xls.Excel.createExcel();
     workbook.delete('Sheet1');
 
@@ -77,6 +87,11 @@ class ReportsExportService {
     required String reportTitle,
     required String reportFileKey,
   }) async {
+    final validationErrors = ReportSummaryValidator.validate(result.summary);
+    if (validationErrors.isNotEmpty) {
+      throw StateError('لا يمكن تصدير تقرير غير متسق: ${validationErrors.join('؛ ')}');
+    }
+
     final bytes = await buildPdf(result: result, reportTitle: reportTitle);
     return _writeFile(bytes, _fileName(reportFileKey, 'pdf'));
   }
@@ -86,6 +101,11 @@ class ReportsExportService {
     required String reportTitle,
     required String reportFileKey,
   }) async {
+    final validationErrors = ReportSummaryValidator.validate(result.summary);
+    if (validationErrors.isNotEmpty) {
+      throw StateError('لا يمكن تصدير تقرير غير متسق: ${validationErrors.join('؛ ')}');
+    }
+
     final bytes = await buildExcel(result: result, reportTitle: reportTitle);
     return _writeFile(bytes, _fileName(reportFileKey, 'xlsx'));
   }
@@ -95,6 +115,11 @@ class ReportsExportService {
     required String reportTitle,
     required String reportFileKey,
   }) async {
+    final validationErrors = ReportSummaryValidator.validate(result.summary);
+    if (validationErrors.isNotEmpty) {
+      throw StateError('لا يمكن تصدير تقرير غير متسق: ${validationErrors.join('؛ ')}');
+    }
+
     await Printing.layoutPdf(
       name: _fileName(reportFileKey, 'pdf'),
       onLayout: (_) => buildPdf(result: result, reportTitle: reportTitle),
@@ -106,6 +131,11 @@ class ReportsExportService {
     required String reportTitle,
     required String reportFileKey,
   }) async {
+    final validationErrors = ReportSummaryValidator.validate(result.summary);
+    if (validationErrors.isNotEmpty) {
+      throw StateError('لا يمكن تصدير تقرير غير متسق: ${validationErrors.join('؛ ')}');
+    }
+
     final file = await savePdf(
       result: result,
       reportTitle: reportTitle,
@@ -128,6 +158,11 @@ class ReportsExportService {
     required String reportTitle,
     required String reportFileKey,
   }) async {
+    final validationErrors = ReportSummaryValidator.validate(result.summary);
+    if (validationErrors.isNotEmpty) {
+      throw StateError('لا يمكن تصدير تقرير غير متسق: ${validationErrors.join('؛ ')}');
+    }
+
     final file = await saveExcel(
       result: result,
       reportTitle: reportTitle,
