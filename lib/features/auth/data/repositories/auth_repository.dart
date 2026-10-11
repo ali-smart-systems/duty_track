@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../../../../../../../core/constants/app_constants.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
 
