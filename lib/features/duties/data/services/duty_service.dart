@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../../core/constants/app_constants.dart';
 import '../models/duty_model.dart';
 import '../models/duty_personnel_model.dart';
+import '../validation/duty_assignment_validator.dart';
 
 class DutyService {
   DutyService({FirebaseFirestore? firestore})
@@ -115,16 +116,10 @@ class DutyService {
   }
 
   void _validateAssignments(List<DutyPersonnelModel> personnel) {
-    if (personnel.isEmpty) {
-      throw ArgumentError('يجب إسناد فرد واحد على الأقل');
-    }
-    final ids = personnel.map((item) => item.personnelId).toList();
-    if (ids.toSet().length != ids.length) {
-      throw ArgumentError('لا يجوز تكرار الفرد في نفس المناوبة');
-    }
-    if (personnel.where((item) => item.isLeader).length > 1) {
-      throw ArgumentError('لا يجوز إسناد أكثر من قائد للمناوبة');
-    }
+    DutyAssignmentValidator.validate(
+      personnelIds: personnel.map((item) => item.personnelId).toList(),
+      leaderCount: personnel.where((item) => item.isLeader).length,
+    );
   }
 
   Future<void> replaceDutyWithPersonnel(
