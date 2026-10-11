@@ -48,7 +48,18 @@ class AuthRepository {
 
     await _service.signInWithEmailAndPassword(email: email, password: password);
 
-    return UserModel.fromMap(data, userDoc.id);
+    final authenticated = _service.currentUser;
+    if (authenticated == null || authenticated.uid != userDoc.id ||
+        authenticated.email?.toLowerCase() != email.toLowerCase()) {
+      await _service.signOut();
+      throw Exception('حساب المصادقة لا يطابق سجل المستخدم الإداري.');
+    }
+    final user = UserModel.fromMap(data, userDoc.id);
+    if (!user.isActive || user.isDeleted) {
+      await _service.signOut();
+      throw Exception('هذا الحساب غير نشط أو تم إيقافه.');
+    }
+    return user;
   }
 
   Future<void> logout() async {
