@@ -48,6 +48,10 @@ class DutyRepository {
     return _service.addDuty(duty);
   }
 
+  Future<void> replaceDutyWithPersonnel(DutyModel duty, List<DutyPersonnelModel> personnel) {
+    return _service.replaceDutyWithPersonnel(duty, personnel);
+  }
+
   Future<void> updateDuty(DutyModel duty) {
     return _service.updateDuty(duty);
   }
