@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../app/app_routes.dart';
+import '../../../auth/providers/auth_provider.dart';
 
 import '../../../../features/master_data/presentation/screens/master_data_screen.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Drawer(
       child: ListView(
         children: [
@@ -20,28 +23,32 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
 
-          const ListTile(leading: Icon(Icons.home), title: Text('الرئيسية')),
+          ListTile(leading: Icon(Icons.home), title: Text('الرئيسية')),
 
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.groups),
-            title: Text('القوة البشرية'),
+            title: const Text('القوة البشرية'),
+            onTap: () { Navigator.pop(context); context.go(AppRoutes.personnel); },
           ),
 
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.assignment),
-            title: Text('المهام'),
+            title: const Text('المهام'),
+            onTap: () { Navigator.pop(context); context.go(AppRoutes.tasks); },
           ),
 
-          const ListTile(leading: Icon(Icons.event), title: Text('الإجازات')),
+          ListTile(leading: Icon(Icons.event), title: Text('الإجازات')),
 
           const ListTile(
             leading: Icon(Icons.school),
-            title: Text('البرامج الثقافية'),
+            title: const Text('البرامج الثقافية'),
+            onTap: () { Navigator.pop(context); context.go(AppRoutes.culturalPrograms); },
           ),
 
           const ListTile(
             leading: Icon(Icons.bar_chart),
-            title: Text('التقارير'),
+            title: const Text('التقارير'),
+            onTap: () { Navigator.pop(context); context.go(AppRoutes.reports); },
           ),
 
           const Divider(),
@@ -75,7 +82,8 @@ class AppDrawer extends StatelessWidget {
             title: const Text('تسجيل الخروج'),
             onTap: () async {
               Navigator.pop(context);
-              await FirebaseAuth.instance.signOut();
+              await ref.read(authProvider.notifier).logout();
+      if (context.mounted) context.go(AppRoutes.login);
             },
           ),
         ],
