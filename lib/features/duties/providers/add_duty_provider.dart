@@ -47,11 +47,7 @@ class AddDutyNotifier extends StateNotifier<AddDutyState> {
         return;
       }
 
-      final dutyId = await repository.addDuty(duty);
-
-      for (final item in personnel) {
-        await repository.addPersonnelToDuty(item.copyWith(dutyId: dutyId));
-      }
+      await repository.createDutyWithPersonnel(duty, personnel);
 
       _ref.invalidate(dutyListProvider);
 
