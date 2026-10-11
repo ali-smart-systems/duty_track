@@ -12,7 +12,7 @@ Version: 1.0
 Duty Track is an Enterprise Human Resources Management System (HRMS)
 designed specifically for military and security organizations.
 
-The first deployment target is the Human Resources Department at Taiz Central Prison.
+The first deployment target is the Human Resources Department at Dhamar Central Correctional Facility.
 
 The system replaces paper-based workflows with a secure digital platform.
 
