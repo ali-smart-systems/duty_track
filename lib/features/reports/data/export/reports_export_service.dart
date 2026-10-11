@@ -248,7 +248,7 @@ class ReportsExportService {
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
           pw.Text(
-            'وثيقة رسمية مولدة بواسطة ${AppConstants.appName}',
+            'مسودة للمراجعة - غير معتمدة - ${AppConstants.appName}',
             style: const pw.TextStyle(fontSize: 8, color: PdfColors.blueGrey600),
           ),
           pw.Text(
@@ -468,7 +468,7 @@ class ReportsExportService {
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('اعتماد مدير الموارد البشرية'),
+            pw.Text('مراجعة مدير القوة البشرية'),
             pw.SizedBox(height: 26),
             pw.Container(width: 170, height: 0.8, color: PdfColors.blueGrey400),
             pw.SizedBox(height: 4),
@@ -476,7 +476,7 @@ class ReportsExportService {
           ],
         ),
         pw.Text(
-          'هذا التقرير مخصص للاستخدام الإداري الرسمي.',
+          'مسودة غير معتمدة؛ لا تُرفع قبل المراجعة والتوقيع.',
           style: const pw.TextStyle(fontSize: 9, color: PdfColors.blueGrey700),
         ),
       ],
@@ -536,8 +536,8 @@ class ReportsExportService {
       sheet.appendRow([xls.TextCellValue(recommendation)]);
     }
     sheet.appendRow([]);
-    sheet.appendRow([xls.TextCellValue('Signature')]);
-    sheet.appendRow([xls.TextCellValue('HR Manager Name / Signature / Stamp')]);
+    sheet.appendRow([xls.TextCellValue('Review / Approval Required')]);
+    sheet.appendRow([xls.TextCellValue('Draft - not approved; manager review and signature required')]);
   }
 
   void _buildExcelDistributionSheet(xls.Excel workbook, ReportResult result) {
@@ -603,7 +603,6 @@ class ReportsExportService {
       xls.TextCellValue('Location'),
       xls.TextCellValue('Post'),
       xls.TextCellValue('Status'),
-      xls.TextCellValue('Phone'),
     ]);
 
     for (final item in result.personnel) {
@@ -615,7 +614,6 @@ class ReportsExportService {
         xls.TextCellValue(item.serviceLocationName),
         xls.TextCellValue(item.servicePostName),
         xls.TextCellValue(item.personnel.status),
-        xls.TextCellValue(item.personnel.phone),
       ]);
     }
   }
