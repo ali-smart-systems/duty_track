@@ -22,9 +22,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _repository;
 
   StreamSubscription? _subscription;
+  int _authRevision = 0;
 
   void _listenAuthState() {
     _subscription = _repository.authStateChanges().listen((user) async {
+      final revision = ++_authRevision;
       if (user == null) {
         if (!mounted) return;
         state = state.copyWith(
@@ -37,7 +39,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       try {
         final currentUser = await _repository.currentUserData();
-        if (!mounted) return;
+        if (!mounted || revision != _authRevision) return;
         state = state.copyWith(
           isInitialized: true,
           user: currentUser != null && currentUser.isActive && !currentUser.isDeleted
@@ -47,7 +49,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           clearError: true,
         );
       } catch (error) {
-        if (!mounted) return;
+        if (!mounted || revision != _authRevision) return;
         state = state.copyWith(
           isInitialized: true,
           clearUser: true,
@@ -69,10 +71,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
         password: password,
       );
 
+      if (!mounted) return false;
       state = state.copyWith(isInitialized: true, isLoading: false, user: user);
 
       return true;
     } catch (e) {
+      if (!mounted) return false;
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
 
       return false;
@@ -80,13 +84,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
+    ++_authRevision;
     await _repository.logout();
-
-    state = state.copyWith(clearUser: true);
+    if (mounted) state = state.copyWith(clearUser: true);
   }
 
   @override
   void dispose() {
+    ++_authRevision;
     _subscription?.cancel();
     super.dispose();
   }
