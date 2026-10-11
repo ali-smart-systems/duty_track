@@ -14,6 +14,7 @@ import 'package:uuid/uuid.dart';
 import '../../../data/models/duty_personnel_model.dart';
 import '../../../providers/edit_duty_provider.dart';
 import '../../../../master_data/providers/task_type_provider.dart';
+import '../../../providers/duty_repository_provider.dart';
 
 class DutyForm extends ConsumerStatefulWidget {
   const DutyForm({super.key, this.duty});
@@ -38,6 +39,7 @@ class _DutyFormState extends ConsumerState<DutyForm> {
     super.initState();
 
     if (widget.duty != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _loadExistingPersonnel());
       _date = widget.duty!.date;
       _shift = widget.duty!.shiftId;
       _location = widget.duty!.serviceLocationId;
@@ -53,6 +55,28 @@ class _DutyFormState extends ConsumerState<DutyForm> {
   final TextEditingController _notesController = TextEditingController();
 
   final List<DutyPersonnelViewModel> _personnel = [];
+  bool _loadingExistingPersonnel = false;
+  bool _existingPersonnelLoaded = false;
+
+  Future<void> _loadExistingPersonnel() async {
+    if (widget.duty == null || _existingPersonnelLoaded || _loadingExistingPersonnel) return;
+    setState(() => _loadingExistingPersonnel = true);
+    try {
+      final people = await ref.read(dutyRepositoryProvider)
+          .getDutyPersonnelViewModels(widget.duty!.id);
+      if (!mounted) return;
+      setState(() {
+        _personnel
+          ..clear()
+          ..addAll(people);
+        _existingPersonnelLoaded = true;
+      });
+    } catch (_) {
+      if (mounted) _showMessage('تعذر تحميل الأفراد الحاليين؛ لا يمكن حفظ التعديل');
+    } finally {
+      if (mounted) setState(() => _loadingExistingPersonnel = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -135,7 +159,7 @@ class _DutyFormState extends ConsumerState<DutyForm> {
           const SizedBox(height: 16),
 
           DutyActionsSection(
-            isLoading: isLoading,
+            isLoading: isLoading || _loadingExistingPersonnel,
 
             onSave: _save,
 
@@ -183,6 +207,10 @@ class _DutyFormState extends ConsumerState<DutyForm> {
   }
 
   Future<void> _save() async {
+    if (widget.duty != null && !_existingPersonnelLoaded) {
+      _showMessage('يجب تحميل إسنادات الأفراد الحالية قبل حفظ التعديل');
+      return;
+    }
     debugPrint('========== SAVE PRESSED ==========');
     if (_date == null) {
       _showMessage("يرجى اختيار تاريخ المناوبة");
