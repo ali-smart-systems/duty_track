@@ -48,13 +48,7 @@ class EditDutyNotifier extends StateNotifier<EditDutyState> {
         return;
       }
 
-      await repository.updateDuty(duty);
-
-      await repository.removeAllPersonnelFromDuty(duty.id);
-
-      for (final item in personnel) {
-        await repository.addPersonnelToDuty(item.copyWith(dutyId: duty.id));
-      }
+      await repository.replaceDutyWithPersonnel(duty, personnel);
 
       _ref
         ..invalidate(dutyListProvider)
