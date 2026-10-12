@@ -79,7 +79,10 @@ class ReportsExportService {
     _buildExcelDutiesSheet(workbook, result);
     _buildExcelPersonnelSheet(workbook, result);
 
-    final bytes = workbook.encode() ?? <int>[];
+    final bytes = workbook.encode();
+    if (bytes == null || bytes.isEmpty) {
+      throw StateError('فشل إنشاء ملف Excel، لم يتم إنتاج بيانات صالحة');
+    }
     return Uint8List.fromList(bytes);
   }
 
@@ -674,6 +677,7 @@ class ReportsExportService {
       RegExp(r'[^a-zA-Z0-9_]'),
       '_',
     );
-    return 'duty_track_${normalizedTitle}_$timestamp.$extension';
+    final safeTitle = normalizedTitle.isEmpty ? 'report' : normalizedTitle;
+    return 'duty_track_${safeTitle}_$timestamp.$extension';
   }
 }
